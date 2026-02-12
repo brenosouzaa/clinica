@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nova Senha | L'Odontologie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gold-border { border-color: #bf9b30; }
+        .gold-text { color: #bf9b30; }
+        
+        .fade-in { animation: fadeIn 0.6s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        body { background-color: #f8fafc; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden fade-in border border-gray-100 relative">
+        
+        <div class="p-8 pt-10">
+            <div class="w-16 h-16 bg-[#bf9b30]/10 rounded-full flex items-center justify-center mx-auto mb-5 text-[#bf9b30]">
+                <i class="fas fa-lock-open text-2xl"></i>
+            </div>
+
+            <div class="text-center mb-8">
+                <h2 class="text-xl font-serif font-bold text-gray-900">Redefinir Senha</h2>
+                <p class="text-xs text-gray-400 mt-1">Crie uma nova senha segura para sua conta.</p>
+            </div>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="bg-yellow-50 text-yellow-700 text-xs font-bold p-3 rounded-xl mb-5 text-center border border-yellow-200 flex items-center justify-center gap-2">
+                            <i class="fas fa-exclamation-triangle"></i> {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" class="space-y-5" onsubmit="return validarFormulario()">
+                
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1 ml-1">Código de Verificação</label>
+                    <input type="text" name="codigo" required placeholder="000000" maxlength="6" class="w-full bg-gray-50 border-2 border-gray-200 text-center text-2xl font-bold tracking-[0.5em] rounded-xl p-3 focus:border-[#bf9b30] outline-none transition-colors text-gray-800 placeholder-gray-300">
+                </div>
+                
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1 ml-1">Nova Senha</label>
+                    <div class="relative">
+                        <input type="password" name="senha" id="senha" required placeholder="Mínimo 6 caracteres" minlength="6" class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-xl p-3.5 pl-10 pr-10 focus:border-[#bf9b30] focus:bg-white outline-none transition-all">
+                        <i class="fas fa-key absolute left-4 top-4 text-gray-400"></i>
+                        <i class="fas fa-eye absolute right-4 top-4 text-gray-400 cursor-pointer hover:text-black transition" onclick="toggleSenha('senha')"></i>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1 ml-1">Confirmar Senha</label>
+                    <div class="relative">
+                        <input type="password" id="confirma_senha" required placeholder="Repita a senha" minlength="6" class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-xl p-3.5 pl-10 focus:border-[#bf9b30] focus:bg-white outline-none transition-all">
+                        <i class="fas fa-check-circle absolute left-4 top-4 text-gray-400"></i>
+                    </div>
+                    <p id="erro-senha" class="text-[10px] text-red-500 font-bold hidden mt-1 ml-1">As senhas não coincidem.</p>
+                </div>
+
+                <button type="submit" class="w-full bg-black text-white py-4 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-[#bf9b30] transition shadow-lg transform active:scale-[0.98] mt-2">
+                    Alterar Senha
+                </button>
+            </form>
+
+            <div class="mt-8 text-center pt-4 border-t border-gray-50">
+                <a href="/login" class="text-xs text-gray-400 hover:text-black font-bold transition uppercase tracking-wide">
+                    Cancelar e Voltar
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Função para mostrar/esconder senha
+        function toggleSenha(id) {
+            const input = document.getElementById(id);
+            const icon = input.nextElementSibling.nextElementSibling; // Pega o ícone do olho
+            
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+                icon.classList.add('text-black');
+            } else {
+                input.type = "password";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+                icon.classList.remove('text-black');
+            }
+        }
+
+        // Validação antes de enviar
+        function validarFormulario() {
+            const s1 = document.getElementById('senha').value;
+            const s2 = document.getElementById('confirma_senha').value;
+            const erro = document.getElementById('erro-senha');
+
+            if (s1.length < 6) {
+                alert("A senha deve ter no mínimo 6 caracteres.");
+                return false;
+            }
+
+            if (s1 !== s2) {
+                erro.classList.remove('hidden');
+                document.getElementById('confirma_senha').classList.add('border-red-400');
+                return false;
+            } else {
+                erro.classList.add('hidden');
+                document.getElementById('confirma_senha').classList.remove('border-red-400');
+                return true;
+            }
+        }
+    </script>
+</body>
+</html>

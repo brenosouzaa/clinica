@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeria Clínica | L'Odontologie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { 
+                        'gold-primary': '#C6A87C', 
+                        'gold-light': '#F3E5D0',
+                        'bg-soft': '#F9F9F9',
+                        'text-main': '#1A1A1A',
+                        'text-muted': '#666666'
+                    },
+                    fontFamily: { 
+                        serif: ['"Playfair Display"', 'serif'], 
+                        sans: ['"Manrope"', 'sans-serif'] 
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px -10px rgba(0,0,0,0.05)',
+                        'hover': '0 20px 50px -12px rgba(198, 168, 124, 0.15)',
+                        'floating': '0 10px 30px rgba(0,0,0,0.1)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #F9F9F9; }
+        .fade-in-up { animation: fadeInUp 0.8s ease-out forwards; opacity: 0; transform: translateY(20px); }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+        
+        /* CORREÇÃO DO ERRO 1: Adicionado line-clamp padrão */
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3; /* Propriedade padrão para compatibilidade */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="text-text-main font-sans antialiased">
+
+    <nav class="fixed w-full z-40 top-0 py-5 px-8 flex justify-between items-center bg-white/90 backdrop-blur-md border-b border-gray-100 transition-all">
+        <a href="/" class="text-text-muted hover:text-gold-primary transition flex items-center gap-2 group text-[11px] uppercase tracking-[0.2em] font-semibold">
+            <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
+            <span>Voltar</span>
+        </a>
+        <div class="text-xl font-serif italic font-medium tracking-tight">L'Odontologie</div>
+        <div class="w-10"></div>
+    </nav>
+
+    <header class="pt-40 pb-16 text-center px-6 max-w-4xl mx-auto fade-in-up">
+        <span class="inline-block py-1 px-3 border border-gold-primary/30 rounded-full text-[10px] uppercase tracking-[0.25em] text-gold-primary font-bold mb-5">
+            Portfólio Clínico
+        </span>
+        <h1 class="text-4xl md:text-5xl font-serif text-text-main mb-6 leading-tight">
+            Transformações & <span class="italic text-gold-primary">Resultados</span>
+        </h1>
+        <p class="text-text-muted font-light text-base max-w-xl mx-auto leading-relaxed">
+            Selecione um caso abaixo para visualizar os detalhes do procedimento e a análise do especialista.
+        </p>
+    </header>
+
+    <main class="px-6 md:px-12 pb-32 max-w-[1400px] mx-auto">
+        
+        {% if posts %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            
+            {% for post in posts %}
+            <article class="bg-white rounded-[1.5rem] p-6 shadow-soft hover:shadow-hover transition-all duration-500 cursor-pointer fade-in-up group border border-gray-50 flex flex-col"
+                     style="animation-delay: '{{ loop.index0 * 100 }} ms'"
+                     data-img="{{ post.imagem_arquivo }}"
+                     data-titulo="{{ post.titulo }}"
+                     data-desc="{{ post.descricao }}"
+                     data-dentista="{{ post.dentista.nome if post.dentista else 'Equipe L\'Odontologie' }}"
+                     data-especialidade="{{ post.dentista.especialidade if post.dentista else 'Estética Dental' }}"
+                     data-foto-dentista="{{ post.dentista.foto_perfil if post.dentista and post.dentista.foto_perfil else 'https://cdn-icons-png.flaticon.com/512/149/149071.png' }}"
+                     onclick="abrirModal(this)">
+
+                <div class="flex items-center gap-3 mb-5 border-b border-gray-50 pb-4">
+                    <img src="{{ post.dentista.foto_perfil if post.dentista and post.dentista.foto_perfil else 'https://cdn-icons-png.flaticon.com/512/149/149071.png' }}" 
+                         class="w-12 h-12 rounded-full object-cover p-0.5 border border-gold-primary/20">
+                    <div>
+                        <p class="text-sm font-bold text-text-main leading-tight">
+                            {{ post.dentista.nome if post.dentista else 'Dr. Especialista' }}
+                        </p>
+                        <p class="text-[10px] text-gold-primary uppercase tracking-widest mt-0.5">
+                            {{ post.dentista.especialidade if post.dentista else 'Odontologia' }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="relative w-full aspect-[4/3] rounded-xl overflow-hidden mb-6 group-hover:ring-1 ring-gold-primary/20 transition-all">
+                    <img src="{{ post.imagem_arquivo }}" 
+                         onerror="this.src='https://images.unsplash.com/photo-1606811971618-4486d14f3f99?q=80&w=800'"
+                         class="w-full h-full object-cover transition duration-[1.5s] ease-in-out group-hover:scale-105">
+                    
+                    <div class="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
+                        <span class="bg-white/95 backdrop-blur px-5 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-lg transform translate-y-4 group-hover:translate-y-0 transition duration-300">
+                            Ver Detalhes
+                        </span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col flex-grow">
+                    <h3 class="text-2xl font-serif text-text-main mb-3 leading-tight group-hover:text-gold-primary transition-colors">
+                        {{ post.titulo }}
+                    </h3>
+                    <div class="w-10 h-[1px] bg-gold-primary/40 mb-3"></div>
+                    <p class="text-text-muted text-sm font-light leading-relaxed line-clamp-3 mb-4">
+                        {{ post.descricao }}
+                    </p>
+                    <div class="mt-auto pt-4 flex items-center justify-between text-[10px] uppercase tracking-widest text-gray-400 font-bold">
+                        <span>Caso Clínico</span>
+                        <i class="fas fa-arrow-right group-hover:text-gold-primary transition transform group-hover:translate-x-1"></i>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+
+        </div>
+        {% else %}
+        <div class="flex flex-col items-center justify-center py-24 bg-white rounded-3xl shadow-sm border border-dashed border-gray-200">
+            <i class="fas fa-camera-retro text-4xl text-gray-200 mb-4"></i>
+            <p class="text-gray-400 font-serif italic">Nenhum caso publicado ainda.</p>
+        </div>
+        {% endif %}
+
+    </main>
+
+    <footer class="text-center py-8 border-t border-gray-200 bg-white">
+        <p class="text-[10px] text-gray-400 uppercase tracking-widest">L'Odontologie • Excellence</p>
+    </footer>
+
+    <div id="modal" class="fixed inset-0 z-[100] hidden opacity-0 transition-opacity duration-300" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        
+        <div class="absolute inset-0 bg-white/95 backdrop-blur-xl transition-opacity" onclick="fecharModal()"></div>
+
+        <button onclick="fecharModal()" class="absolute top-6 left-6 md:top-10 md:left-10 z-[110] group flex items-center gap-3 focus:outline-none">
+            <div class="w-12 h-12 rounded-full bg-white shadow-floating border border-gray-100 flex items-center justify-center transition-all duration-300 group-hover:-translate-x-1 group-hover:border-gold-primary text-text-main group-hover:text-gold-primary">
+                <i class="fas fa-arrow-left text-lg"></i>
+            </div>
+            <span class="text-text-muted font-serif italic text-lg opacity-0 group-hover:opacity-100 transition-all duration-300 -translate-x-2 group-hover:translate-x-0 hidden md:block">
+                Voltar
+            </span>
+        </button>
+
+        <div class="relative z-10 w-full h-full flex items-center justify-center p-4">
+            
+            <div class="flex flex-col md:flex-row w-full max-w-6xl h-[85vh] bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-gray-100 transform scale-95 transition-transform duration-300" id="modal-content">
+                
+                <div class="w-full md:w-3/5 h-1/2 md:h-full bg-gray-50 flex items-center justify-center relative group">
+                    <img id="modal-img" src="" class="w-full h-full object-cover">
+                </div>
+
+                <div class="w-full md:w-2/5 h-1/2 md:h-full p-10 overflow-y-auto bg-white flex flex-col">
+                    
+                    <div class="flex items-center gap-4 mb-8 pb-6 border-b border-gray-100">
+                        <img id="modal-foto-dentista" src="" class="w-16 h-16 rounded-full object-cover p-1 border border-gold-primary/30">
+                        <div>
+                            <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Responsável Técnico</p>
+                            <p id="modal-dentista-nome" class="text-lg font-bold text-text-main"></p>
+                            <p id="modal-dentista-especialidade" class="text-xs text-gold-primary italic"></p>
+                        </div>
+                    </div>
+
+                    <h2 class="text-3xl font-serif text-text-main mb-6 leading-tight" id="modal-titulo"></h2>
+                    
+                    <div class="prose prose-stone prose-sm">
+                        <p id="modal-desc" class="text-text-muted font-light text-base leading-loose"></p>
+                    </div>
+
+                    <div class="mt-auto pt-8">
+                        <a href="/login" class="w-full block text-center py-4 border border-text-main text-text-main hover:bg-gold-primary hover:border-gold-primary hover:text-white transition-all rounded-lg text-xs font-bold uppercase tracking-[0.2em]">
+                            Agendar Consulta
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('modal');
+        const modalContent = document.getElementById('modal-content');
+
+        function abrirModal(elemento) {
+            const img = elemento.getAttribute('data-img');
+            const titulo = elemento.getAttribute('data-titulo');
+            const desc = elemento.getAttribute('data-desc');
+            const dentista = elemento.getAttribute('data-dentista');
+            const especialidade = elemento.getAttribute('data-especialidade');
+            const fotoDentista = elemento.getAttribute('data-foto-dentista');
+
+            document.getElementById('modal-img').src = img;
+            document.getElementById('modal-titulo').innerText = titulo;
+            document.getElementById('modal-desc').innerText = desc;
+            document.getElementById('modal-dentista-nome').innerText = dentista;
+            document.getElementById('modal-dentista-especialidade').innerText = especialidade;
+            document.getElementById('modal-foto-dentista').src = fotoDentista;
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modalContent.classList.remove('scale-95');
+                modalContent.classList.add('scale-100');
+            }, 10);
+            
+            document.body.style.overflow = 'hidden';
+        }
+
+        function fecharModal() {
+            modal.classList.add('opacity-0');
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.getElementById('modal-img').src = "";
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Escape") fecharModal();
+        });
+    </script>
+</body>
+</html>

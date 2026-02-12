@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L'Odontologie | Exclusive</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'luxury-black': '#0a0a0a',
+                        'luxury-gold': '#bf9b30',
+                        'luxury-gray': '#f5f5f7',
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['"Inter"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .hover-zoom { transition: transform 0.7s ease; }
+        .group:hover .hover-zoom { transform: scale(1.05); }
+        body { background-color: #f5f5f7; }
+    </style>
+</head>
+<body class="bg-luxury-gray text-luxury-black font-sans antialiased">
+
+    <nav class="fixed w-full z-50 top-0 py-4 px-5 md:py-6 md:px-12 flex justify-between items-center glass-panel shadow-sm">
+        <div class="text-base md:text-xl font-serif font-bold tracking-[0.15em] md:tracking-[0.2em] truncate mr-2">
+            L'ODONTOLOGIE
+        </div>
+        
+        <div class="flex items-center gap-4 md:gap-6">
+            {% if current_user.is_authenticated %}
+                <a href="/painel/{{current_user.tipo}}" class="flex items-center gap-2 md:gap-3 text-xs font-bold uppercase tracking-widest hover:text-luxury-gold transition">
+                    <div class="text-right hidden md:block">
+                        <p class="text-[9px] text-gray-400">Olá,</p>
+                        <p>{{ current_user.nome.split()[0] }}</p>
+                    </div>
+                    {% if current_user.foto_perfil %}
+                        <img src="{{ current_user.foto_perfil }}" class="w-8 h-8 md:w-9 md:h-9 rounded-full border border-gray-300 object-cover">
+                    {% else %}
+                        <div class="w-8 h-8 md:w-9 md:h-9 rounded-full border border-gray-300 bg-gray-200 flex items-center justify-center">
+                            <i class="fas fa-user text-gray-400"></i>
+                        </div>
+                    {% endif %}
+                </a>
+            {% else %}
+                <a href="/login" class="bg-luxury-black text-white px-5 py-2 md:px-8 md:py-3 rounded-full text-[9px] md:text-xs font-bold uppercase tracking-widest hover:bg-luxury-gold transition duration-300 shadow-lg whitespace-nowrap">
+                    Entrar
+                </a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main class="pt-28 pb-12 px-4 md:px-12 max-w-[1400px] mx-auto min-h-screen flex flex-col justify-center">
+        
+        <div class="mb-10 text-center md:text-left animate-fade-in">
+            <h1 class="text-4xl md:text-7xl font-serif leading-[1.1] md:leading-[0.95] text-luxury-black">
+                {{ content.titulo_principal }} <br> 
+                <span class="text-luxury-gold italic font-light">{{ content.titulo_destaque }}</span>
+            </h1>
+            <p class="mt-4 md:mt-6 text-gray-500 max-w-lg text-xs md:text-sm leading-relaxed mx-auto md:mx-0 md:border-l-2 md:border-luxury-gold md:pl-6">
+                {{ content.subtitulo }}
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-4 md:gap-6 h-auto md:h-[600px]">
+
+            <div class="md:col-span-2 md:row-span-2 bg-white rounded-[2rem] p-6 md:p-8 shadow-sm hover:shadow-2xl transition duration-500 relative overflow-hidden group border border-gray-100 cursor-pointer h-80 md:h-auto" onclick="window.location.href='{% if current_user.is_authenticated %}/painel/paciente{% else %}/login{% endif %}'">
+                <div class="absolute inset-0 bg-cover bg-center group-hover:opacity-100 transition duration-700 hover-zoom" 
+                     style="background-image: url('{{ content.img_agendamento }}');"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+                
+                <div class="relative z-10 h-full flex flex-col justify-end text-white p-2 md:p-4">
+                    <span class="bg-luxury-gold w-fit text-white text-[9px] font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3">Agendamento Online</span>
+                    <h3 class="text-2xl md:text-4xl font-serif mb-2">Sua próxima visita.</h3>
+                    <p class="text-gray-300 text-xs md:text-sm mb-4 md:mb-6 max-w-xs">Gerencie seus horários com exclusividade e sem filas.</p>
+                    
+                    <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest group-hover:translate-x-2 transition">
+                        Acessar Agenda <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="md:col-span-1 md:row-span-1 bg-white rounded-[2rem] p-6 shadow-sm hover:shadow-lg transition border border-gray-100 flex flex-col justify-between group h-48 md:h-auto">
+                <div class="flex justify-between items-start">
+                    <div class="bg-luxury-gray p-3 rounded-2xl text-luxury-black group-hover:bg-luxury-black group-hover:text-white transition">
+                        <i class="fas fa-map-marker-alt text-lg md:text-xl"></i>
+                    </div>
+                    <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Jardins • SP</span>
+                </div>
+                <div>
+                    <h4 class="font-serif text-lg md:text-xl mt-2 md:mt-4">Unidades</h4>
+                    <p class="text-gray-400 text-[10px] md:text-xs mt-1">Encontre a clínica mais próxima.</p>
+                </div>
+                <button onclick="window.location.href='/unidades'" class="mt-2 w-full py-2 text-[10px] md:text-xs font-bold border border-gray-200 rounded-xl hover:bg-luxury-gold hover:border-luxury-gold hover:text-white transition uppercase tracking-wider">
+                    Ver Mapa e Unidades
+                </button>
+            </div>
+
+            <div class="md:col-span-1 md:row-span-1 bg-[#111] rounded-[2rem] p-6 shadow-sm hover:shadow-lg transition border border-gray-100 overflow-hidden relative group cursor-pointer h-48 md:h-auto" onclick="window.location.href='/profissionais'">
+                <img src="{{ content.img_especialistas }}" class="absolute right-0 top-0 h-full w-2/3 object-cover opacity-40 group-hover:opacity-60 transition duration-700 hover-zoom">
+                <div class="absolute inset-0 bg-gradient-to-r from-[#111] to-transparent"></div>
+                
+                <div class="relative z-10 h-full flex flex-col justify-between text-white">
+                    <div>
+                        <h4 class="font-serif text-lg md:text-xl text-luxury-gold">Experts</h4>
+                        <p class="text-gray-400 text-[10px] md:text-xs mt-1">Corpo clínico de elite.</p>
+                    </div>
+                    <div class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest group-hover:translate-x-2 transition">
+                        Ver Equipe <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="md:col-span-2 md:row-span-1 bg-white rounded-[2rem] p-6 md:p-8 shadow-sm hover:shadow-xl transition flex flex-col md:flex-row items-start md:items-center justify-between group cursor-pointer border border-gray-100 h-auto gap-4" onclick="window.location.href='/portfolio'">
+                <div>
+                    <h3 class="text-xl md:text-2xl font-serif text-luxury-black">Portfólio Real</h3>
+                    <p class="text-gray-400 text-xs mt-1 md:mt-2 max-w-xs">Veja os casos clínicos e transformações realizadas.</p>
+                    <div class="mt-4 md:mt-6 flex space-x-1">
+                        <span class="h-1 w-8 bg-luxury-gold rounded-full"></span>
+                        <span class="h-1 w-1 bg-gray-200 rounded-full"></span>
+                        <span class="h-1 w-1 bg-gray-200 rounded-full"></span>
+                    </div>
+                </div>
+                
+                <div class="flex -space-x-3 md:-space-x-4 w-full md:w-auto justify-end md:justify-start">
+                    {% for dentista in dentistas[:3] %}
+                    <div class="w-10 h-10 md:w-14 md:h-14 rounded-full border-2 border-white bg-gray-100 overflow-hidden">
+                        {% if dentista.foto_perfil %}
+                            <img src="{{ dentista.foto_perfil }}" class="w-full h-full object-cover">
+                        {% else %}
+                            <img src="https://cdn-icons-png.flaticon.com/512/3774/3774299.png" class="w-full h-full object-cover opacity-50">
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    <div class="w-10 h-10 md:w-14 md:h-14 rounded-full border-2 border-white bg-luxury-black flex items-center justify-center text-white text-[9px] md:text-[10px] font-bold shadow-lg group-hover:bg-luxury-gold transition">Ver</div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="text-center py-10 border-t border-gray-200 bg-white">
+        
+        <div class="flex justify-center gap-8 mb-6">
+            <a href="https://wa.me/5511999999999?text=Olá,%20gostaria%20de%20agendar%20uma%20consulta%20exclusive." target="_blank" class="text-luxury-black hover:text-luxury-gold transition text-2xl hover:scale-110 duration-300" title="WhatsApp">
+                <i class="fab fa-whatsapp"></i>
+            </a>
+            <a href="https://instagram.com/lodontologie" target="_blank" class="text-luxury-black hover:text-luxury-gold transition text-2xl hover:scale-110 duration-300" title="Instagram">
+                <i class="fab fa-instagram"></i>
+            </a>
+        </div>
+
+        <p class="font-serif font-bold tracking-widest text-xs text-luxury-black">L'ODONTOLOGIE</p>
+        <p class="text-[9px] text-gray-400 mt-2 uppercase tracking-widest">© 2026 Exclusive Dental Care</p>
+    </footer>
+
+</body>
+</html>

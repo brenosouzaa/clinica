@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmar | L'Odontologie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gold-text { color: #bf9b30; }
+        .fade-in { animation: fadeIn 0.8s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden fade-in border border-gray-100 text-center">
+        
+        <div class="p-8">
+            <div class="w-16 h-16 bg-[#bf9b30]/10 rounded-full flex items-center justify-center mx-auto mb-6 text-[#bf9b30]">
+                <i class="fas fa-shield-alt text-3xl"></i>
+            </div>
+
+            <h2 class="text-2xl font-serif font-bold mb-2">Verificação</h2>
+            <p class="text-sm text-gray-500 mb-6">Enviamos um código para seu contato.</p>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="bg-yellow-50 text-yellow-700 text-xs font-bold p-3 rounded-lg mb-4 border border-yellow-200">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" class="space-y-6">
+                <div>
+                    <input type="text" name="codigo" required placeholder="0 0 0 0 0 0" maxlength="6" class="w-full bg-gray-50 border-2 border-gray-200 text-center text-3xl font-bold tracking-[0.5em] rounded-xl p-4 focus:border-[#bf9b30] outline-none transition text-gray-700">
+                </div>
+
+                <button class="w-full bg-black text-white py-4 rounded-xl font-bold uppercase tracking-widest hover:bg-[#bf9b30] transition shadow-lg text-xs">
+                    Confirmar Código
+                </button>
+            </form>
+
+            <div class="mt-6">
+                <a href="/register" class="text-xs text-gray-400 hover:text-red-500 font-bold">Cancelar e Voltar</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

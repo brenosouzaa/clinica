@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Criar Conta | L'Odontologie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gold-border { border-color: #bf9b30; }
+        .gold-text { color: #bf9b30; }
+        .radio-card:checked + div {
+            border-color: #bf9b30;
+            background-color: #fffbeb;
+            color: #bf9b30;
+            box-shadow: 0 4px 6px -1px rgba(191, 155, 48, 0.2);
+        }
+        .fade-in { animation: fadeIn 0.6s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body { background-color: #f8fafc; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden fade-in border border-gray-100 relative">
+        
+        <a href="/login" class="absolute top-6 left-6 text-gray-400 hover:text-black transition z-10">
+            <i class="fas fa-arrow-left text-lg"></i>
+        </a>
+
+        <div class="pt-10 pb-2 text-center px-8">
+            <h1 class="font-serif text-xl font-bold tracking-[0.2em] text-gray-900">L'ODONTOLOGIE</h1>
+            <p class="text-[9px] text-[#bf9b30] uppercase tracking-[0.3em] mt-1 font-bold">Membro Exclusivo</p>
+            
+            <h2 class="text-2xl font-serif mt-6 text-gray-800">Crie sua conta</h2>
+            <p class="text-xs text-gray-400 mt-1">Preencha os dados para iniciar seu atendimento.</p>
+        </div>
+
+        <div class="p-8 pt-6">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="bg-red-50 text-red-500 text-xs font-bold p-3 rounded-xl mb-5 text-center border border-red-100 flex items-center justify-center gap-2">
+                            <i class="fas fa-exclamation-circle"></i> {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form action="/register" method="POST" class="space-y-4" onsubmit="return validarSenhas()">
+                
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1 ml-1">Nome Completo</label>
+                    <div class="relative">
+                        <input type="text" name="nome" required placeholder="Seu nome" class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-xl p-3.5 pl-10 focus:border-[#bf9b30] focus:bg-white outline-none transition-all">
+                        <i class="fas fa-user absolute left-4 top-4 text-gray-400"></i>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1 ml-1">E-mail</label>
+                    <div class="relative">
+                        <input type="email" name="email" required placeholder="seu@email.com" class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-xl p-3.5 pl-10 focus:border-[#bf9b30] focus:bg-white outline-none transition-all">
+                        <i class="fas fa-envelope absolute left-4 top-4 text-gray-400"></i>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1 ml-1">WhatsApp</label>
+                    <div class="relative">
+                        <input type="tel" name="telefone" id="telefone" required placeholder="(00) 00000-0000" maxlength="15" class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-xl p-3.5 pl-10 focus:border-[#bf9b30] focus:bg-white outline-none transition-all">
+                        <i class="fab fa-whatsapp absolute left-4 top-4 text-gray-400"></i>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1 ml-1">Senha</label>
+                        <div class="relative">
+                            <input type="password" name="senha" id="senha" required minlength="6" placeholder="Mín 6 carac." class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-xl p-3.5 focus:border-[#bf9b30] focus:bg-white outline-none transition-all">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1 ml-1">Confirmar</label>
+                        <div class="relative">
+                            <input type="password" name="confirm_senha" id="confirm_senha" required minlength="6" placeholder="Repita" class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-xl p-3.5 focus:border-[#bf9b30] focus:bg-white outline-none transition-all">
+                        </div>
+                    </div>
+                </div>
+                <p id="erro-senha" class="text-[10px] text-red-500 font-bold hidden text-center mt-1">As senhas não coincidem.</p>
+
+                <div class="pt-4 border-t border-gray-50 mt-4">
+                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-3 text-center tracking-wider">Onde deseja receber o código?</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <label class="cursor-pointer group">
+                            <input type="radio" name="metodo_envio" value="email" class="hidden radio-card" checked>
+                            <div class="border-2 border-gray-100 rounded-xl p-3 text-center transition group-hover:border-gray-300">
+                                <i class="fas fa-envelope mb-1 text-gray-400 group-hover:text-gray-600"></i>
+                                <span class="block text-xs font-bold text-gray-600">E-mail</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer group">
+                            <input type="radio" name="metodo_envio" value="whatsapp" class="hidden radio-card">
+                            <div class="border-2 border-gray-100 rounded-xl p-3 text-center transition group-hover:border-gray-300">
+                                <i class="fab fa-whatsapp mb-1 text-gray-400 group-hover:text-green-500"></i>
+                                <span class="block text-xs font-bold text-gray-600">WhatsApp</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-black text-white py-4 rounded-xl font-bold uppercase tracking-widest text-xs shadow-lg hover:bg-[#bf9b30] transition transform active:scale-[0.98] mt-6">
+                    Continuar
+                </button>
+            </form>
+
+            <div class="text-center mt-6">
+                <a href="/login" class="text-xs text-gray-400 hover:text-black font-medium border-b border-transparent hover:border-black transition pb-0.5">
+                    Já possui uma conta? Entrar
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Máscara de Telefone Automática
+        const telInput = document.getElementById('telefone');
+        telInput.addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, "");
+            if (value.length > 11) value = value.slice(0, 11);
+            
+            if (value.length > 2) {
+                value = `(${value.slice(0, 2)}) ${value.slice(2)}`;
+            }
+            if (value.length > 9) {
+                value = `${value.slice(0, 9)}-${value.slice(9)}`; // (XX) XXXXX-XXXX
+            } else if (value.length > 8) {
+                 // Fallback para fixo se necessário
+            }
+            e.target.value = value;
+        });
+
+        // Validação de Senha no Cliente
+        function validarSenhas() {
+            const s1 = document.getElementById('senha').value;
+            const s2 = document.getElementById('confirm_senha').value;
+            const erroMsg = document.getElementById('erro-senha');
+
+            if (s1 !== s2) {
+                erroMsg.classList.remove('hidden');
+                document.getElementById('confirm_senha').classList.add('border-red-500');
+                return false; 
+            }
+            
+            if(s1.length < 6) {
+                alert("A senha deve ter no mínimo 6 caracteres.");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</body>
+</html>

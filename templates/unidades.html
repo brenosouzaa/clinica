@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nossas Unidades | L'Odontologie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { 'luxury-black': '#0a0a0a', 'luxury-gold': '#bf9b30', 'luxury-gray': '#f5f5f7' },
+                    fontFamily: { serif: ['"Playfair Display"', 'serif'], sans: ['"Inter"', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        .radio-card:checked + div { border-color: #bf9b30; background-color: #fffbeb; }
+        .map-container iframe { width: 100%; height: 100%; border: none; }
+        
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #d4d4d4; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-luxury-gray text-luxury-black font-sans antialiased h-screen w-screen overflow-hidden flex flex-col">
+
+    <nav class="w-full z-50 py-4 px-5 md:px-12 flex justify-between items-center bg-white border-b border-gray-100 shrink-0 shadow-sm">
+        <div class="flex items-center gap-3">
+            <a href="/" class="text-gray-400 hover:text-luxury-black transition p-2 -ml-2">
+                <i class="fas fa-arrow-left text-lg"></i>
+            </a>
+            <div class="text-base md:text-xl font-serif font-bold tracking-[0.15em] truncate">L'ODONTOLOGIE</div>
+        </div>
+        <div class="hidden md:block text-[10px] font-bold text-luxury-gold uppercase tracking-widest">Localização Exclusiva</div>
+    </nav>
+
+    <div class="flex-1 flex flex-col-reverse md:flex-row overflow-hidden relative">
+        
+        <div class="w-full md:w-1/3 h-[40%] md:h-full bg-white flex flex-col z-20 shadow-2xl relative">
+            
+            <div class="flex-1 overflow-y-auto custom-scroll p-6 space-y-4">
+                
+                <div class="pb-2 text-center md:text-left">
+                    <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-4 md:hidden"></div>
+                    <h1 class="text-2xl md:text-3xl font-serif mb-1 text-gray-900">Nossas Unidades</h1>
+                    <p class="text-xs text-gray-500 mb-6">Selecione para ver no mapa.</p>
+                </div>
+
+                {% for clinica in clinicas %}
+                <label class="cursor-pointer group block">
+                    <input type="radio" name="unidade_selecionada" 
+                           class="hidden radio-card" 
+                           data-abre="{{ clinica.horario_abertura }}"
+                           data-fecha="{{ clinica.horario_fechamento }}"
+                           onchange="mudarMapa('{{ clinica.endereco_completo }}', this)"
+                           {% if loop.first %}checked{% endif %}>
+                    
+                    <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm active:scale-[0.95] transition-all duration-200">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="bg-black text-white text-[9px] font-bold px-2 py-1 rounded uppercase tracking-wider">{{ clinica.bairro }}</span>
+                            {% if loop.first %}
+                            <span class="text-[10px] text-green-600 font-bold flex items-center gap-1 bg-green-50 px-2 py-0.5 rounded-full">
+                                <i class="fas fa-check-circle"></i> Principal
+                            </span>
+                            {% endif %}
+                       {% for clinica in clinicas %}
+<div class="bg-white p-6 rounded-[2rem] border border-gray-100 relative group hover:shadow-lg transition">
+    
+    <div class="mt-4 space-y-2 text-sm text-gray-500">
+        <p><i class="fas fa-map-marker-alt w-5 text-center"></i> {{ clinica.endereco_completo }}</p>
+        
+        <p class="text-xs text-gray-400">
+            <i class="far fa-clock w-5 text-center"></i> {{ clinica.horario_abertura }} às {{ clinica.horario_fechamento }}
+        </p>
+
+        <p><i class="fas fa-phone w-5 text-center"></i> {{ clinica.telefone }}</p>
+    </div>
+</div>
+{% endfor %}
+                </label>
+                {% endfor %}
+                
+                <div class="h-10"></div> </div>
+        </div>
+
+        <div class="w-full md:w-2/3 h-[60%] md:h-full bg-gray-200 relative map-container z-0">
+            <iframe id="google-map" 
+                    src="" 
+                    allowfullscreen="" 
+                    loading="lazy"></iframe>
+            
+            <div id="status-unidade" class="absolute top-4 right-4 md:bottom-12 md:left-6 md:top-auto md:right-auto bg-white/90 backdrop-blur px-4 py-2 rounded-lg shadow-lg border-l-4 border-green-500 pointer-events-none transition-all duration-300">
+                <p id="status-texto" class="text-[10px] font-bold flex items-center gap-2 text-gray-800">
+                    <span id="status-bola" class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> 
+                    <span id="status-label">Aberto Agora</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function mudarMapa(endereco, elemento) {
+            // 1. Atualiza o Mapa com Link Estável
+            const mapFrame = document.getElementById('google-map');
+            const encodedAddress = encodeURIComponent(endereco);
+            // URL oficial para embed que permite clicar e abrir no Google Maps
+            mapFrame.src = `https://maps.google.com/maps?q=${encodedAddress}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+
+            // 2. Lógica Automática de Aberto/Fechado
+            const horaAbre = elemento.getAttribute('data-abre') || "08:00";
+            const horaFecha = elemento.getAttribute('data-fecha') || "18:00";
+            
+            const agora = new Date();
+            const horaAtualStr = agora.getHours().toString().padStart(2, '0') + ":" + agora.getMinutes().toString().padStart(2, '0');
+
+            const statusBox = document.getElementById('status-unidade');
+            const statusLabel = document.getElementById('status-label');
+            const statusBola = document.getElementById('status-bola');
+
+            if (horaAtualStr >= horaAbre && horaAtualStr <= horaFecha) {
+                statusBox.style.borderColor = "#22c55e"; // verde-500
+                statusBola.className = "w-2 h-2 bg-green-500 rounded-full animate-pulse";
+                statusLabel.innerHTML = `Disponível Agora • Fecha às ${horaFecha}`;
+                statusLabel.style.color = "#15803d"; // verde-700
+            } else {
+                statusBox.style.borderColor = "#ef4444"; // vermelho-500
+                statusBola.className = "w-2 h-2 bg-red-500 rounded-full";
+                statusLabel.innerHTML = `Fechado • Abre às ${horaAbre}`;
+                statusLabel.style.color = "#b91c1c"; // vermelho-700
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const selecionada = document.querySelector('input[name="unidade_selecionada"]:checked');
+            if(selecionada) {
+                setTimeout(() => selecionada.onchange(), 200);
+            }
+        });
+    </script>
+</body>
+</html>

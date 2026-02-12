@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Acesso Restrito | L'Odontologie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Cores da Identidade Visual */
+        .gold-text { color: #bf9b30; }
+        .focus-gold:focus { border-color: #bf9b30; outline-color: #bf9b30; }
+        
+        /* Animação suave */
+        .fade-in { animation: fadeIn 0.8s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        body { background-color: #f8fafc; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden fade-in border border-gray-100 relative">
+        
+        <a href="/" class="absolute top-6 left-6 text-gray-400 hover:text-black transition z-10 p-2">
+            <i class="fas fa-arrow-left text-lg"></i>
+        </a>
+
+        <div class="pt-12 pb-4 text-center px-8">
+            <h1 class="font-serif text-2xl font-bold tracking-[0.2em] text-gray-900">L'ODONTOLOGIE</h1>
+            <p class="text-[10px] text-[#bf9b30] uppercase tracking-[0.3em] mt-2 font-bold">Membro Exclusivo</p>
+            
+            <h2 class="text-xl font-serif mt-8 text-gray-800">Bem-vindo de volta</h2>
+            <p class="text-xs text-gray-400 mt-1">Digite suas credenciais para acessar.</p>
+        </div>
+
+        <div class="p-8 pt-4">
+            
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="bg-red-50 text-red-500 text-xs font-bold p-3 rounded-xl mb-6 text-center border border-red-100 flex items-center justify-center gap-2">
+                            <i class="fas fa-exclamation-circle"></i> {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" class="space-y-5">
+                
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1 ml-1">E-mail</label>
+                    <div class="relative">
+                        <input type="email" name="email" required placeholder="seu@email.com" class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-xl p-3.5 pl-10 focus-gold outline-none transition-all focus:bg-white focus:shadow-md">
+                        <i class="fas fa-envelope absolute left-4 top-4 text-gray-400"></i>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1 ml-1">Senha</label>
+                    <div class="relative">
+                        <input type="password" name="senha" required placeholder="••••••••" class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-xl p-3.5 pl-10 focus-gold outline-none transition-all focus:bg-white focus:shadow-md">
+                        <i class="fas fa-lock absolute left-4 top-4 text-gray-400"></i>
+                    </div>
+                    <div class="text-right mt-2">
+                        <a href="/reset-password" class="text-[10px] text-gray-400 hover:text-[#bf9b30] font-bold transition">Esqueceu a senha?</a>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-black text-white py-4 rounded-xl font-bold uppercase tracking-widest text-xs shadow-lg hover:bg-[#bf9b30] transition transform active:scale-[0.98] mt-2">
+                    Entrar
+                </button>
+            </form>
+
+            <div class="relative flex py-6 items-center">
+                <div class="flex-grow border-t border-gray-100"></div>
+                <span class="flex-shrink-0 mx-4 text-[10px] text-gray-300 uppercase">Ou</span>
+                <div class="flex-grow border-t border-gray-100"></div>
+            </div>
+
+            <div class="text-center">
+                <p class="text-xs text-gray-400 mb-3">Ainda não é membro?</p>
+                <a href="/register" class="block w-full py-3 border-2 border-gray-900 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-gray-900 hover:text-white transition text-gray-900">
+                    Criar Nova Conta
+                </a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

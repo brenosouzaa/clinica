@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Perfil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen font-sans">
+
+    <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-lg">
+        <h1 class="text-2xl font-serif font-bold mb-6 text-center">Editar Meu Perfil</h1>
+        
+        <form method="POST" enctype="multipart/form-data" class="space-y-4">
+            
+            <div class="text-center mb-6">
+                <img src="{{ current_user.foto_perfil }}" class="w-24 h-24 rounded-full mx-auto mb-2 object-cover border">
+                <label class="text-xs text-blue-500 cursor-pointer hover:underline">
+                    Alterar Foto
+                    <input type="file" name="foto" class="hidden">
+                </label>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold uppercase text-gray-500">Nome Completo</label>
+                <input type="text" name="nome" value="{{ current_user.nome }}" class="w-full border p-2 rounded">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-500">Telefone</label>
+                    <input type="text" name="telefone" value="{{ current_user.telefone or '' }}" placeholder="(00) 00000-0000" class="w-full border p-2 rounded">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-500">Endereço</label>
+                    <input type="text" name="endereco" value="{{ current_user.endereco or '' }}" placeholder="Rua, Nº" class="w-full border p-2 rounded">
+                </div>
+            </div>
+
+            {% if current_user.tipo == 'dentista' %}
+            <div class="bg-yellow-50 p-4 rounded border border-yellow-200">
+                <p class="text-xs font-bold text-yellow-800 mb-2">Área do Profissional</p>
+                <label class="block text-xs font-bold uppercase text-gray-500">Especialidade</label>
+                <input type="text" name="especialidade" value="{{ current_user.especialidade or '' }}" class="w-full border p-2 rounded mb-2">
+                
+                <label class="block text-xs font-bold uppercase text-gray-500">Biografia (Aparece no site)</label>
+                <textarea name="bio" class="w-full border p-2 rounded h-20">{{ current_user.bio or '' }}</textarea>
+            </div>
+            {% endif %}
+
+            <button class="w-full bg-black text-white py-3 font-bold rounded hover:bg-gray-800">Salvar Alterações</button>
+        </form>
+        
+        <a href="/painel/{{ current_user.tipo }}" class="block text-center mt-4 text-sm text-gray-500">Cancelar</a>
+    </div>
+
+</body>
+</html>
