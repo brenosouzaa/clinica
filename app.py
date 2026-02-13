@@ -9,11 +9,19 @@ from datetime import datetime, date, timedelta
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'chave_premium_2026'
-
+app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY", "dev_key_local")
 # --- SUA CONEXÃO ORIGINAL (MANTIDA) ---
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:123789ab@localhost/clinica'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# --- CORREÇÃO PARA O RENDER (POSTGRESQL) ---
+uri = os.environ.get("DATABASE_URL")
+
+if not uri:
+    raise RuntimeError("DATABASE_URL não configurada no Render.")
+
+if uri.startswith("postgres://"):
+    uri = uri.replace("postgres://", "postgresql://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = uri
+
 
 # Configuração de Uploads
 UPLOAD_FOLDER = 'static/uploads'
@@ -714,4 +722,4 @@ with app.app_context():
         db.session.commit()
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run()
