@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nossas Unidades | L'Odontologie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { 'luxury-black': '#0a0a0a', 'luxury-gold': '#bf9b30', 'luxury-gray': '#f8f8f8' },
+                    fontFamily: { serif: ['"Playfair Display"', 'serif'], sans: ['"Inter"', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Efeito de seleção dourada no card */
+        .radio-card:checked + .card-content { 
+            border-color: #bf9b30; 
+            background-color: #fffbeb;
+            box-shadow: 0 10px 15px -3px rgba(191, 155, 48, 0.1);
+        }
+        .radio-card:checked + .card-content .unit-badge { background-color: #bf9b30; color: white; }
+        
+        .custom-scroll::-webkit-scrollbar { width: 3px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
+        
+        iframe { filter: grayscale(0.2) contrast(1.1); }
+    </style>
+</head>
+<body class="bg-luxury-gray text-luxury-black font-sans antialiased h-screen w-screen overflow-hidden flex flex-col">
+
+    <nav class="w-full z-50 py-5 px-6 md:px-12 flex justify-between items-center bg-white border-b border-gray-100 shrink-0 shadow-sm">
+        <div class="flex items-center gap-6">
+            <a href="/" class="group flex items-center gap-2 text-gray-400 hover:text-luxury-black transition">
+                <i class="fas fa-chevron-left text-sm group-hover:-translate-x-1 transition-transform"></i>
+                <span class="text-[10px] font-bold uppercase tracking-widest">Voltar</span>
+            </a>
+            <div class="h-6 w-[1px] bg-gray-200 hidden md:block"></div>
+            <div class="text-xl md:text-2xl font-serif font-bold tracking-tighter text-gray-900">L'ODONTOLOGIE</div>
+    </nav>
+
+    <div class="flex-1 flex flex-col-reverse md:flex-row overflow-hidden">
+        
+        <div class="w-full md:w-[400px] lg:w-[450px] h-[45%] md:h-full bg-white flex flex-col z-20 shadow-2xl relative border-r border-gray-50">
+            <div class="p-6 md:p-10 flex-1 overflow-y-auto custom-scroll">
+                
+                <header class="mb-8">
+                    <h1 class="text-3xl md:text-4xl font-serif text-gray-900 mb-2">Unidades</h1>
+                    <p class="text-xs text-gray-400 font-medium uppercase tracking-widest">Selecione uma clínica para detalhes</p>
+                </header>
+
+                <div class="space-y-4">
+                    {% for clinica in clinicas %}
+                    <label class="relative block cursor-pointer">
+                        <input type="radio" name="unidade_selecionada" class="hidden radio-card" 
+                               data-abre="{{ clinica.horario_abertura }}"
+                               data-fecha="{{ clinica.horario_fechamento }}"
+                               onchange="mudarMapa('{{ clinica.endereco_completo }}', this)"
+                               {% if loop.first %}checked{% endif %}>
+                        
+                        <div class="card-content p-6 rounded-2xl border border-gray-100 bg-white transition-all duration-300 hover:border-luxury-gold/50">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="unit-badge bg-gray-100 text-gray-500 text-[9px] font-bold px-3 py-1 rounded-full transition-colors uppercase tracking-widest">
+                                    {{ clinica.bairro }}
+                                </span>
+                                <i class="fas fa-map-marker-alt text-luxury-gold opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                            </div>
+                            
+                            <h3 class="text-lg font-serif font-bold text-gray-900 mb-2">{{ clinica.nome }}</h3>
+                            
+                            <div class="space-y-2 text-[13px] text-gray-500 font-medium">
+                                <p class="flex items-center gap-3">
+                                    <i class="fas fa-location-arrow text-[10px] text-gray-300"></i> 
+                                    {{ clinica.endereco_completo }}
+                                </p>
+                                <p class="flex items-center gap-3">
+                                    <i class="fas fa-phone text-[10px] text-gray-300"></i> 
+                                    {{ clinica.telefone }}
+                                </p>
+                                <p class="flex items-center gap-3 text-gray-400">
+                                    <i class="far fa-clock text-[10px] text-gray-300"></i> 
+                                    Segunda a Sexta • {{ clinica.horario_abertura }} às {{ clinica.horario_fechamento }}
+                                </p>
+                            </div>
+                        </div>
+                    </label>
+                    {% endfor %}
+                </div>
+
+                <div class="h-10"></div>
+            </div>
+            
+            <div class="p-6 bg-gray-50 border-t border-gray-100 hidden md:block">
+                <p class="text-[10px] text-gray-400 font-bold uppercase text-center">Atendimento Central: (11) 4003-0000</p>
+            </div>
+        </div>
+
+        <div class="w-full md:flex-1 h-[55%] md:h-full bg-gray-100 relative z-0">
+            <iframe id="google-map" 
+                    src="" 
+                    class="w-full h-full"
+                    allowfullscreen="" 
+                    loading="lazy"></iframe>
+            
+            <div id="status-unidade" class="absolute top-6 left-6 md:bottom-12 md:left-12 md:top-auto bg-white/90 backdrop-blur-xl px-5 py-3 rounded-2xl shadow-2xl border border-white flex items-center gap-4 transition-all duration-500 scale-90 md:scale-100">
+                <div id="status-bola" class="w-3 h-3 bg-green-500 rounded-full shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
+                <div class="flex flex-col">
+                    <span id="status-label" class="text-[11px] font-bold uppercase tracking-widest text-gray-900">Verificando...</span>
+                    <span id="horario-label" class="text-[10px] text-gray-400 font-medium">Horário Local</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function mudarMapa(endereco, elemento) {
+            // 1. Atualiza o Mapa (URL Corrigida para Embed de Busca)
+            const mapFrame = document.getElementById('google-map');
+            const encodedAddress = encodeURIComponent(endereco);
+            mapFrame.src = `https://maps.google.com/maps?q=${encodedAddress}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+
+            // 2. Lógica de Status (Aberto/Fechado)
+            const horaAbre = elemento.getAttribute('data-abre');
+            const horaFecha = elemento.getAttribute('data-fecha');
+            
+            const agora = new Date();
+            const horaAtual = agora.getHours() * 60 + agora.getMinutes();
+            
+            const [hA, mA] = horaAbre.split(':').map(Number);
+            const [hF, mF] = horaFecha.split(':').map(Number);
+            
+            const minAbre = hA * 60 + mA;
+            const minFecha = hF * 60 + mF;
+
+            const statusBox = document.getElementById('status-unidade');
+            const statusLabel = document.getElementById('status-label');
+            const statusBola = document.getElementById('status-bola');
+            const horarioLabel = document.getElementById('horario-label');
+
+            if (horaAtual >= minAbre && horaAtual <= minFecha) {
+                statusBola.className = "w-3 h-3 bg-green-500 rounded-full shadow-[0_0_10px_rgba(34,197,94,0.5)] animate-pulse";
+                statusLabel.innerText = "Aberto Agora";
+                statusLabel.className = "text-[11px] font-bold uppercase tracking-widest text-green-600";
+                horarioLabel.innerText = `Disponível até às ${horaFecha}`;
+            } else {
+                statusBola.className = "w-3 h-3 bg-red-500 rounded-full shadow-[0_0_10px_rgba(239,68,68,0.5)]";
+                statusLabel.innerText = "Fechado";
+                statusLabel.className = "text-[11px] font-bold uppercase tracking-widest text-red-500";
+                horarioLabel.innerText = `Abre amanhã às ${horaAbre}`;
+            }
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            const selecionada = document.querySelector('input[name="unidade_selecionada"]:checked');
+            if(selecionada) {
+                setTimeout(() => selecionada.onchange(), 300);
+            }
+        });
+    </script>
+</body>
+</html>

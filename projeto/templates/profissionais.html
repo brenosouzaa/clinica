@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Especialistas | L'Odontologie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'luxury-gold': '#bf9b30',
+                        'luxury-black': '#0f0f0f',
+                        'luxury-gray': '#fcfaf8',
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['"Inter"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scroll::-webkit-scrollbar { width: 3px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
+        .nav-glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="bg-luxury-gray text-luxury-black font-sans antialiased">
+
+    <nav class="fixed w-full z-50 top-0 py-5 px-6 md:px-16 flex justify-between items-center nav-glass border-b border-gray-100">
+        <a href="/" class="flex items-center gap-2 text-gray-400 hover:text-luxury-gold transition group">
+            <i class="fas fa-chevron-left text-xs"></i>
+            <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Voltar</span>
+        </a>
+        <div class="text-xl md:text-2xl font-serif font-bold tracking-tighter text-gray-900">L'ODONTOLOGIE</div>
+        <div class="hidden md:block">
+            <a href="/login" class="text-[10px] font-bold text-luxury-gold uppercase tracking-widest border border-luxury-gold/30 px-5 py-2 rounded-full hover:bg-luxury-gold hover:text-white transition-all">Agendar</a>
+        </div>
+    </nav>
+
+    <header class="pt-40 pb-16 text-center px-6">
+        <span class="text-[9px] uppercase tracking-[0.4em] text-luxury-gold font-semibold mb-4 block">Corpo Clínico</span>
+        <h1 class="text-4xl md:text-5xl font-serif text-gray-900 mb-6">Nossos Especialistas</h1>
+        <div class="w-12 h-[1px] bg-luxury-gold mx-auto mb-6"></div>
+        <p class="text-gray-500 font-light text-sm max-w-lg mx-auto leading-relaxed">
+            Excelência técnica e cuidado individualizado para transformar sua experiência odontológica.
+        </p>
+    </header>
+
+    <main class="px-6 md:px-16 pb-32 max-w-6xl mx-auto">
+        
+        {% if dentistas %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20">
+            
+            {% for d in dentistas %}
+            <div class="flex flex-col items-center text-center">
+                <div class="w-40 h-40 md:w-44 md:h-44 rounded-full overflow-hidden shadow-xl mb-6 border-4 border-white bg-gray-100">
+                    <img src="{{ d.foto_perfil }}" onerror="this.src='https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=500'" 
+                         class="w-full h-full object-cover">
+                </div>
+
+                <div class="px-4">
+                    <span class="text-luxury-gold text-[9px] font-bold uppercase tracking-[0.2em] mb-1 block">{{ d.especialidade or 'Especialista' }}</span>
+                    <h3 class="text-xl font-serif font-bold text-gray-900 mb-3">{{ d.nome }}</h3>
+                    
+                    <p class="text-gray-400 text-xs font-light leading-relaxed line-clamp-2 mb-6">
+                        {{ d.bio or 'Profissional dedicado à excelência e saúde bucal integral.' }}
+                    </p>
+
+                    <div class="flex items-center justify-center gap-5">
+                        <a href="/login" class="text-[10px] font-bold uppercase tracking-widest text-gray-900 hover:text-luxury-gold transition-colors border-b border-gray-200 hover:border-luxury-gold pb-0.5">
+                            Agendar
+                        </a>
+                        {% if d.telefone %}
+                        <a href="https://wa.me/55{{ d.telefone | limpar_telefone }}?text=Olá%20Dr(a).%20{{ d.nome | urlencode }},%20gostaria%20de%20agendar%20uma%20consulta%20na%20L'Odontologie." 
+                           target="_blank" 
+                           class="text-gray-300 hover:text-green-500 transition-colors">
+                            <i class="fab fa-whatsapp text-lg"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+        {% else %}
+        <div class="text-center py-20">
+            <p class="text-gray-300 font-serif italic">Nenhum especialista disponível no momento.</p>
+        </div>
+        {% endif %}
+
+    </main>
+
+    <footer class="bg-luxury-black text-white pt-20 pb-10 px-6 md:px-16 border-t border-white/5">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
+            
+            <div class="space-y-6">
+                <h2 class="text-xl font-serif font-bold tracking-tighter">L'ODONTOLOGIE</h2>
+                <p class="text-gray-500 text-xs font-light leading-relaxed max-w-xs">
+                    Referência em estética dental e saúde bucal de luxo. Tecnologia e arte para o seu sorriso.
+                </p>
+                <div class="flex gap-5 text-gray-400">
+                    <a href="https://instagram.com" target="_blank" class="hover:text-luxury-gold transition-colors text-lg"><i class="fab fa-instagram"></i></a>
+                    <a href="https://wa.me/5511999999999" target="_blank" class="hover:text-luxury-gold transition-colors text-lg"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <h4 class="text-[10px] font-bold uppercase tracking-[0.3em] text-luxury-gold">Atendimento</h4>
+                <ul class="space-y-4 text-xs text-gray-400 font-light">
+                    <li class="flex items-center gap-3">
+                        <i class="fas fa-phone-alt text-[10px] text-luxury-gold"></i>
+                        <span>(11) 4003-0000</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i class="far fa-envelope text-[10px] text-luxury-gold"></i>
+                        <span>contato@lodontologie.com.br</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i class="fas fa-map-marker-alt text-[10px] text-luxury-gold"></i>
+                        <span>São Paulo, Brasil</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="space-y-6">
+                <h4 class="text-[10px] font-bold uppercase tracking-[0.3em] text-luxury-gold">Explorar</h4>
+                <div class="grid grid-cols-2 gap-4 text-xs text-gray-400 font-light">
+                    <a href="/" class="hover:text-white transition">Início</a>
+                    <a href="/unidades" class="hover:text-white transition">Unidades</a>
+                    <a href="/portfolio" class="hover:text-white transition">Galeria</a>
+                    <a href="/login" class="hover:text-white transition">Agendar</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-[9px] text-gray-600 uppercase tracking-widest font-medium">
+                © 2026 L'Odontologie. Todos os direitos reservados.
+            </p>
+            <div class="flex gap-6 text-[9px] text-gray-600 uppercase tracking-widest font-medium">
+                <a href="#" class="hover:text-white transition">Privacidade</a>
+                <a href="#" class="hover:text-white transition">Termos</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

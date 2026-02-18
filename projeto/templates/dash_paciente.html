@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Área do Paciente | Exclusive</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gold-border { border-color: #bf9b30; }
+        .gold-text { color: #bf9b30; }
+        .gold-bg { background-color: #bf9b30; }
+        
+        .radio-card:checked + div {
+            border-color: #bf9b30; background-color: #fffbeb; color: #bf9b30;
+            transform: scale(1.05); box-shadow: 0 10px 15px -3px rgba(191, 155, 48, 0.2); font-weight: bold;
+        }
+        
+        .input-locked { background-color: transparent; border: none; font-weight: 600; color: #374151; }
+        .input-editable { background: #fff; border: 1px solid #e5e7eb; padding: 0.5rem; }
+        .input-editable:focus { border-color: #bf9b30; outline: none; box-shadow: 0 0 0 3px rgba(191, 155, 48, 0.1); }
+
+        .timeline-line { position: absolute; left: 24px; top: 0; bottom: 0; width: 2px; background: #e5e7eb; z-index: 0; }
+        .fade-out { animation: fadeOut 1s forwards; animation-delay: 4s; }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; visibility: hidden; } }
+
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        body { padding-bottom: 80px; } 
+        /* Estilo Bloqueio */
+        .blocked-input { background-color: #e5e7eb !important; color: #9ca3af !important; cursor: not-allowed; border-color: #d1d5db; }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 flex flex-col md:flex-row min-h-screen">
+
+    <aside class="w-64 bg-white shadow-xl z-10 hidden md:flex flex-col justify-between fixed h-full border-r border-gray-100">
+        <div>
+            <div class="p-8 text-center border-b border-gray-50">
+                <h1 class="font-serif text-xl font-bold tracking-widest text-gray-900">L'ODONTOLOGIE</h1>
+                <p class="text-[10px] text-gray-400 uppercase tracking-[0.2em] mt-1">Portal do Paciente</p>
+            </div>
+            
+            <div class="p-6 text-center">
+                <div class="relative w-20 h-20 mx-auto mb-3">
+                    <img src="{{ current_user.foto_perfil }}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/149/149071.png'" class="w-full h-full rounded-full object-cover border-2 border-gray-200 shadow-sm">
+                </div>
+                <p class="font-bold text-sm text-gray-800">{{ current_user.nome }}</p>
+                <p class="text-xs text-gray-400 mt-1 truncate">{{ current_user.email }}</p>
+            </div>
+
+            <nav class="mt-2 space-y-1 px-4">
+                <a onclick="showTab('home')" class="cursor-pointer block p-3 px-4 text-sm font-medium text-gray-500 hover:text-black hover:bg-gray-50 rounded-lg transition flex items-center gap-3 desktop-link tab-active">
+                    <i class="fas fa-home w-4 text-center"></i> Início
+                </a>
+                <a onclick="showTab('agendar')" class="cursor-pointer block p-3 px-4 text-sm font-medium text-gray-500 hover:text-black hover:bg-gray-50 rounded-lg transition flex items-center gap-3 desktop-link">
+                    <i class="fas fa-calendar-plus w-4 text-center"></i> Agendar Consulta
+                </a>
+                <a onclick="showTab('historico')" class="cursor-pointer block p-3 px-4 text-sm font-medium text-gray-500 hover:text-black hover:bg-gray-50 rounded-lg transition flex items-center gap-3 desktop-link">
+                    <i class="fas fa-file-medical-alt w-4 text-center"></i> Meus Prontuários
+                </a>
+                <a onclick="showTab('perfil')" class="cursor-pointer block p-3 px-4 text-sm font-medium text-gray-500 hover:text-black hover:bg-gray-50 rounded-lg transition flex items-center gap-3 desktop-link">
+                    <i class="fas fa-user-edit w-4 text-center"></i> Meus Dados
+                </a>
+            </nav>
+        </div>
+        <div class="p-6 border-t border-gray-50">
+            <a href="/logout" class="flex items-center justify-center gap-2 w-full py-2 text-xs font-bold text-red-400 hover:text-red-600 transition bg-red-50 hover:bg-red-100 rounded-lg">
+                <i class="fas fa-sign-out-alt"></i> SAIR
+            </a>
+        </div>
+    </aside>
+
+    <div class="md:hidden bg-white/95 backdrop-blur-md p-4 shadow-sm flex justify-between items-center sticky top-0 z-40 border-b border-gray-100">
+        <div class="flex items-center gap-3">
+            <img src="{{ current_user.foto_perfil }}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/149/149071.png'" class="w-9 h-9 rounded-full border border-gray-200 object-cover">
+            <div>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Paciente</p>
+                <p class="text-sm font-bold leading-none">{{ current_user.nome.split()[0] }}</p>
+            </div>
+        </div>
+        <a href="/logout" class="text-gray-400 hover:text-red-500"><i class="fas fa-sign-out-alt"></i></a>
+    </div>
+
+    <main class="flex-1 md:ml-64 p-4 md:p-10 max-w-7xl mx-auto w-full">
+        
+        {% if erro %}<div class="fade-out fixed top-4 right-4 z-50 bg-white border-l-4 border-red-500 text-red-700 p-4 rounded shadow-2xl flex items-center gap-3 min-w-[300px]"><i class="fas fa-exclamation-triangle text-xl"></i><div><p class="font-bold text-sm">Atenção</p><p class="text-xs">{{ erro }}</p></div></div>{% endif %}
+        {% if sucesso %}<div class="fade-out fixed top-4 right-4 z-50 bg-white border-l-4 border-green-500 text-green-800 p-4 rounded shadow-2xl flex items-center gap-3 min-w-[300px]"><i class="fas fa-check-circle text-green-600 text-xl"></i><div><p class="font-bold text-sm">Sucesso</p><p class="text-xs">{{ sucesso }}</p></div></div>{% endif %}
+
+       <div id="home" class="tab-content">
+            <div class="flex justify-between items-end mb-8">
+                <div>
+                    <h2 class="text-2xl font-serif font-bold text-gray-900">Painel Geral</h2>
+                    <p class="text-sm text-gray-500">Acompanhe seus agendamentos e histórico.</p>
+                </div>
+                <button onclick="showTab('agendar')" class="bg-black text-white px-5 py-2.5 rounded-lg text-xs font-bold shadow hover:bg-[#bf9b30] transition flex items-center gap-2">
+                    <i class="fas fa-plus"></i> Novo Agendamento
+                </button>
+            </div>
+            
+            <h3 class="text-sm font-bold uppercase text-gray-400 mb-4 tracking-widest">Próximas Consultas</h3>
+            {% if futuras %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                    {% for item in futuras %}
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden relative group hover:shadow-md transition">
+                        <div class="absolute left-0 top-0 h-full w-1.5 bg-[#bf9b30]"></div>
+                        <div class="p-6 pl-8">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <div class="flex items-baseline gap-1">
+                                        <span class="text-4xl font-serif font-bold text-gray-900">{{ item.data_hora.strftime('%d') }}</span>
+                                        <span class="text-sm font-bold text-[#bf9b30] uppercase">{{ item.data_hora.strftime('%b') }}</span>
+                                    </div>
+                                    <p class="text-sm text-gray-500 font-medium mt-1">
+                                        <i class="far fa-clock text-xs"></i> {{ item.data_hora.strftime('%H:%M') }}
+                                    </p>
+                                </div>
+                                <img src="{{ item.dentista.foto_perfil }}" class="w-12 h-12 rounded-full border-2 border-white object-cover shadow-sm bg-gray-100">
+                            </div>
+                            <div class="mb-4">
+                                <h3 class="font-bold text-lg leading-tight">{{ item.servico }}</h3>
+                                <p class="text-xs text-gray-500 mt-1">Dr(a). {{ item.dentista.nome }}</p>
+                                <p class="text-xs text-[#bf9b30] font-bold mt-1 uppercase">{{ item.status }}</p>
+                            </div>
+                            {% if item.status != 'Em Andamento' %}
+                            <form method="POST" onsubmit="return confirm('Deseja cancelar esta consulta?')">
+                                <input type="hidden" name="acao" value="cancelar">
+                                <input type="hidden" name="id_agendamento" value="{{ item.id }}">
+                                <button class="w-full py-2 border border-gray-200 rounded-lg text-xs font-bold text-gray-400 hover:text-red-500 hover:border-red-500 transition">Cancelar</button>
+                            </form>
+                            {% else %}
+                                <div class="w-full py-2 bg-green-50 text-green-600 rounded-lg text-xs font-bold text-center animate-pulse">EM ATENDIMENTO...</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="bg-white p-8 text-center rounded-xl border border-dashed border-gray-200 opacity-60 mb-12">
+                    <p class="text-gray-500 italic">Nenhuma consulta agendada.</p>
+                </div>
+            {% endif %}
+
+            <h3 class="text-sm font-bold uppercase text-gray-400 mb-4 tracking-widest border-t border-gray-100 pt-8">Histórico Recente</h3>
+            <div class="space-y-4">
+                {% if passadas %}
+                    {% for item in passadas[:5] %}
+                    <div onclick="abrirProntuario('{{ item.id }}')" class="flex items-center justify-between bg-white p-4 rounded-xl border border-gray-100 hover:shadow-md transition cursor-pointer group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full bg-gray-100 group-hover:bg-[#bf9b30] group-hover:text-white transition flex items-center justify-center text-gray-400">
+                                <i class="fas fa-file-medical"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-sm text-gray-800">{{ item.servico }}</p>
+                                <p class="text-xs text-gray-500">{{ item.data_hora.strftime('%d/%m/%Y às %H:%M') }} - Dr(a). {{ item.dentista.nome.split()[0] }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-[9px] font-bold uppercase px-3 py-1 rounded-full {% if item.status == 'Concluído' %} bg-green-50 text-green-600 {% elif item.status == 'Cancelado' %} bg-red-50 text-red-600 {% else %} bg-gray-100 text-gray-500 {% endif %}">
+                                {{ item.status }}
+                            </span>
+                            <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <button onclick="showTab('historico')" class="text-xs font-bold text-[#bf9b30] hover:underline mt-2">Ver histórico completo</button>
+                {% else %}
+                    <p class="text-xs text-gray-400 italic">Nenhum histórico encontrado.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div id="agendar" class="tab-content hidden">
+            <h2 class="text-2xl font-serif font-bold text-gray-900 mb-2">Solicitar Agendamento</h2>
+            <p class="text-sm text-gray-500 mb-8">Escolha a clínica e o especialista ideal.</p>
+
+            <form method="POST" class="max-w-6xl mx-auto">
+                <input type="hidden" name="acao" value="agendar">
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <label class="cursor-pointer group">
+                        <input type="radio" name="motivo_visual" value="Avaliação Geral" class="hidden radio-card" required checked>
+                        <div class="border-2 border-gray-100 bg-white p-4 rounded-xl text-center hover:border-gray-300 h-full flex flex-col items-center justify-center gap-3 transition duration-300">
+                            <i class="fas fa-clipboard-check text-2xl text-gray-300 group-hover:text-[#bf9b30] transition"></i>
+                            <span class="text-xs font-bold text-gray-600 group-hover:text-black">Avaliação</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer group">
+                        <input type="radio" name="motivo_visual" value="Dor de Dente" class="hidden radio-card">
+                        <div class="border-2 border-gray-100 bg-white p-4 rounded-xl text-center hover:border-gray-300 h-full flex flex-col items-center justify-center gap-3 transition duration-300">
+                            <i class="fas fa-tooth text-2xl text-gray-300 group-hover:text-red-500 transition"></i>
+                            <span class="text-xs font-bold text-gray-600">Urgência</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer group">
+                        <input type="radio" name="motivo_visual" value="Estética" class="hidden radio-card">
+                        <div class="border-2 border-gray-100 bg-white p-4 rounded-xl text-center hover:border-gray-300 h-full flex flex-col items-center justify-center gap-3 transition duration-300">
+                            <i class="fas fa-gem text-2xl text-gray-300 group-hover:text-blue-500 transition"></i>
+                            <span class="text-xs font-bold text-gray-600">Estética</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer group">
+                        <input type="radio" name="motivo_visual" value="Ortodontia" class="hidden radio-card">
+                        <div class="border-2 border-gray-100 bg-white p-4 rounded-xl text-center hover:border-gray-300 h-full flex flex-col items-center justify-center gap-3 transition duration-300">
+                            <i class="fas fa-ruler-combined text-2xl text-gray-300 group-hover:text-purple-500 transition"></i>
+                            <span class="text-xs font-bold text-gray-600">Aparelho</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 bg-white p-8 rounded-2xl shadow-lg border border-gray-100 h-fit">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Unidade / Clínica</label>
+                                <select name="clinica_id_agendamento" id="clinica_select" onchange="filtrarMedicos()" required class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg p-3.5 outline-none focus:border-[#bf9b30] transition">
+                                    <option value="">Selecione...</option>
+                                    {% for c in clinicas %}<option value="{{ c.id }}">{{ c.nome }}</option>{% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Especialista</label>
+                                <select name="dentista" id="dentista_select" onchange="mostrarPreviewMedico()" required class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg p-3.5 outline-none focus:border-[#bf9b30] transition">
+                                    <option value="">Selecione a Clínica Primeiro</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mb-8">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Data</label>
+                                <input type="date" name="data_dia" id="data_agendar" onchange="atualizarHorariosDisponiveis()" required class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg p-3.5 focus:border-[#bf9b30] outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Horário</label>
+                                <select name="data_hora" id="hora_input" required class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg p-3.5 focus:border-[#bf9b30] outline-none">
+                                    <option value="08:00">08:00</option><option value="09:00">09:00</option>
+                                    <option value="10:00">10:00</option><option value="11:00">11:00</option>
+                                    <option value="13:00">13:00</option><option value="14:00">14:00</option>
+                                    <option value="15:00">15:00</option><option value="16:00">16:00</option>
+                                    <option value="17:00">17:00</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="w-full bg-black text-white py-4 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-[#bf9b30] transition shadow-lg transform active:scale-[0.98]">Confirmar Agendamento</button>
+                    </div>
+
+                    <div id="preview-container" class="hidden lg:block h-full">
+                         <div id="preview-placeholder" class="bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl h-full flex flex-col items-center justify-center text-gray-400 p-8 text-center min-h-[300px]">
+                            <i class="fas fa-user-md text-5xl mb-4 text-gray-300"></i>
+                            <p class="text-sm">Selecione o especialista para ver o perfil.</p>
+                        </div>
+                        
+                        {% for d in dentistas %}
+                        <div id="card-medico-{{ d.id }}" class="medico-card hidden bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 h-full min-h-[300px]">
+                            <div class="h-28 bg-gray-900 relative">
+                                <div class="absolute inset-0 bg-gradient-to-r from-black to-gray-800 opacity-90"></div>
+                            </div>
+                            <div class="px-6 relative text-center -mt-14">
+                                <img src="{{ d.foto_perfil }}" class="w-28 h-28 rounded-full border-4 border-white shadow-lg mx-auto object-cover bg-white">
+                                <h3 class="mt-4 text-xl font-serif font-bold text-gray-900">{{ d.nome }}</h3>
+                                <p class="text-xs text-[#bf9b30] uppercase font-bold tracking-widest">{{ d.especialidade }}</p>
+                                
+                                <div class="mt-4 text-left bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase mb-2">Sobre</p>
+                                    <p class="text-sm text-gray-600 italic leading-relaxed line-clamp-3">"{{ d.bio or 'Profissional dedicado à excelência.' }}"</p>
+                                </div>
+
+                                <div class="mt-4 text-left">
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase mb-2">Últimos Casos</p>
+                                    <div class="grid grid-cols-3 gap-2">
+                                        {% if d.portfolio %}
+                                            {% for foto in d.portfolio[:3] %}
+                                            <div class="h-16 rounded-lg overflow-hidden border border-gray-200">
+                                                <img src="{{ foto }}" class="w-full h-full object-cover">
+                                            </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <div class="col-span-3 text-center py-2 text-xs text-gray-300 italic bg-gray-50 rounded-lg">Sem fotos recentes</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div id="historico" class="tab-content hidden">
+            <h2 class="text-2xl font-serif font-bold text-gray-900 mb-6">Meus Prontuários</h2>
+            
+            {% if passadas %}
+            <div class="relative space-y-8 pl-4 max-w-4xl mx-auto">
+                <div class="timeline-line"></div>
+                
+                {% for item in passadas %}
+                <div id="consulta-{{ item.id }}" class="relative z-10 transition-all duration-500">
+                    <div class="w-4 h-4 rounded-full bg-[#bf9b30] border-4 border-white shadow absolute -left-[23px] top-6"></div>
+                    
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                        <div class="flex flex-col md:flex-row justify-between items-start mb-4 border-b border-gray-50 pb-3 gap-2">
+                            <div>
+                                <p class="font-bold text-lg text-gray-800">{{ item.servico }}</p>
+                                <p class="text-xs text-gray-500">Médico: {{ item.dentista.nome }}</p>
+                            </div>
+                            <div class="text-left md:text-right">
+                                <p class="font-mono font-bold text-[#bf9b30]">{{ item.data_hora.strftime('%d/%m/%Y às %H:%M') }}</p>
+                                <span class="text-[9px] font-bold uppercase px-2 py-1 rounded {% if item.status == 'Concluído' %} bg-green-50 text-green-600 {% elif item.status == 'Cancelado' %} bg-red-50 text-red-600 {% else %} bg-gray-100 text-gray-500 {% endif %}">
+                                    {{ item.status }}
+                                </span>
+                            </div>
+                        </div>
+
+                        {% if item.prontuario %}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm bg-gray-50 p-5 rounded-xl border border-gray-100">
+                            <div>
+                                <p class="text-[10px] font-bold uppercase text-[#bf9b30] mb-1">Relato da Consulta:</p>
+                                <p class="text-gray-700 leading-relaxed">{{ item.prontuario.queixa }}</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-bold uppercase text-[#bf9b30] mb-1">Procedimento Realizado:</p>
+                                <p class="text-gray-700 leading-relaxed">{{ item.prontuario.procedimento }}</p>
+                            </div>
+                            <div class="md:col-span-2 mt-2 pt-2 border-t border-gray-200">
+                                <p class="text-[10px] font-bold uppercase text-[#bf9b30] mb-1">Evolução do Caso:</p>
+                                <p class="text-gray-600 italic">"{{ item.prontuario.evolucao }}"</p>
+                                {% if item.prontuario.proximos_passos %}
+                                    <p class="text-xs text-blue-600 font-bold mt-2">Próximos Passos: {{ item.prontuario.proximos_passos }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% else %}
+                            <p class="text-xs text-gray-400 italic">Informações médicas desta consulta não foram registradas ou o atendimento foi cancelado.</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+                <div class="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-gray-200 opacity-60">
+                    <p class="text-gray-500 font-bold">Nenhum histórico disponível.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div id="perfil" class="tab-content hidden">
+            <h2 class="text-2xl font-serif font-bold mb-6">Meus Dados</h2>
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden relative border border-gray-100 max-w-2xl mx-auto">
+                <div class="h-32 bg-gray-900 relative">
+                    <div class="absolute inset-0 bg-gradient-to-r from-black to-gray-800 opacity-90"></div>
+                    <div class="absolute bottom-6 left-8 text-white">
+                        <p class="text-[10px] uppercase tracking-widest text-[#bf9b30] font-bold mb-1">Patient ID: #{{ '%05d' % current_user.id }}</p>
+                        <h3 class="text-xl font-serif">Ficha Cadastral</h3>
+                    </div>
+                </div>
+                
+                <div class="p-8 relative">
+                    <div class="absolute -top-12 right-8 w-24 h-24 rounded-full border-4 border-white shadow-2xl overflow-hidden bg-white">
+                        <img src="{{ current_user.foto_perfil }}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/149/149071.png'" class="w-full h-full object-cover">
+                    </div>
+
+                    <form method="POST" enctype="multipart/form-data" class="mt-4 space-y-6">
+                        <input type="hidden" name="acao" value="perfil">
+                        
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Nome Completo</label>
+                            <input type="text" name="nome" id="nome" value="{{ current_user.nome }}" required disabled class="input-locked w-full border-b border-gray-200 py-2 text-lg text-gray-800 focus:border-[#bf9b30] outline-none">
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">WhatsApp</label>
+                                <input type="text" name="telefone" id="telefone" value="{{ current_user.telefone or '' }}" required disabled class="input-locked w-full border-b border-gray-200 py-2 text-lg text-gray-800 focus:border-[#bf9b30] outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">E-mail</label>
+                                <input type="email" name="email" id="email" value="{{ current_user.email }}" required disabled class="input-locked w-full border-b border-gray-200 py-2 text-lg text-gray-800 focus:border-[#bf9b30] outline-none">
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                            <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Endereço (Obrigatório)</label>
+                            <input type="text" name="endereco" id="endereco" value="{{ current_user.endereco or '' }}" required disabled class="input-locked w-full bg-transparent border-b border-gray-300 py-2 outline-none text-gray-800">
+                        </div>
+                        
+                        <div id="campo-senha" class="hidden bg-gray-50 p-4 rounded-xl border border-gray-200">
+                            <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Alterar Senha (Mínimo 6 caracteres)</label>
+                            <input type="password" name="senha" id="senha_input" minlength="6" placeholder="Nova senha" class="w-full bg-white border border-gray-300 rounded-lg p-3 text-sm outline-none focus:border-[#bf9b30]">
+                        </div>
+                        
+                        <div id="campo-foto" class="hidden mt-4">
+                            <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Alterar Foto</label>
+                            <input type="file" name="foto_perfil" class="text-xs text-gray-500">
+                        </div>
+                        
+                        <div class="flex gap-4 pt-6 border-t border-gray-50">
+                            <button type="button" id="btn-editar" onclick="ativarEdicao()" class="px-6 py-2.5 border border-gray-300 rounded-lg text-sm font-bold text-gray-600 hover:bg-black hover:text-white transition uppercase tracking-wider">Editar Dados</button>
+                            <button type="submit" id="btn-salvar" class="hidden px-6 py-2.5 bg-green-600 rounded-lg text-sm font-bold text-white hover:bg-green-700 transition shadow-lg uppercase tracking-wider">Salvar</button>
+                            <button type="button" id="btn-cancelar" onclick="window.location.reload()" class="hidden px-6 py-2.5 border border-red-200 rounded-lg text-sm font-bold text-red-500 hover:bg-red-50 transition uppercase tracking-wider">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur shadow-2xl z-50 flex justify-around py-3 border-t border-gray-100">
+        <button onclick="showTab('home')" class="mobile-link text-[#bf9b30] flex flex-col items-center"><i class="fas fa-home text-lg"></i> <span class="text-[9px] font-bold uppercase">Início</span></button>
+        <button onclick="showTab('agendar')" class="mobile-link text-gray-400 flex flex-col items-center"><i class="fas fa-calendar-plus text-lg"></i> <span class="text-[9px] font-bold uppercase">Agendar</span></button>
+        <button onclick="showTab('historico')" class="mobile-link text-gray-400 flex flex-col items-center"><i class="fas fa-file-medical text-lg"></i> <span class="text-[9px] font-bold uppercase">Hist.</span></button>
+        <button onclick="showTab('perfil')" class="mobile-link text-gray-400 flex flex-col items-center"><i class="fas fa-user-md text-lg"></i> <span class="text-[9px] font-bold uppercase">Perfil</span></button>
+    </nav>
+
+    <script>
+        const allDoctors = [
+            {% for d in dentistas %}
+            { id: "{{ d.id }}", nome: "{{ d.nome }}", clinica_id: "{{ d.clinica_id }}", esp: "{{ d.especialidade }}", folga: "{{ d.dia_folga_semanal if d.dia_folga_semanal is not none else '' }}" },
+            {% endfor %}
+        ];
+        
+        const ocupados = {{ ocupados|tojson|default('[]') }};
+
+        // PASSA DATAS BLOQUEADAS PARA O JS
+        const datasBloqueadasDict = {};
+        {% for d in dentistas %}
+            {% if d.folgas %}
+            datasBloqueadasDict["{{ d.id }}"] = [
+                {% for f in d.folgas %}
+                "{{ f.data.strftime('%Y-%m-%d') }}",
+                {% endfor %}
+            ];
+            {% endif %}
+        {% endfor %}
+
+        function filtrarMedicos() {
+            const clinicaId = document.getElementById('clinica_select').value;
+            const docSelect = document.getElementById('dentista_select');
+            docSelect.innerHTML = '<option value="">Selecione o Especialista...</option>';
+            document.querySelectorAll('.medico-card').forEach(c => c.classList.add('hidden'));
+            document.getElementById('preview-placeholder').classList.remove('hidden');
+            if(clinicaId) {
+                allDoctors.filter(d => d.clinica_id == clinicaId).forEach(d => {
+                    let opt = document.createElement('option'); opt.value = d.id; opt.innerText = "Dr(a). " + d.nome + " - " + d.esp; docSelect.appendChild(opt);
+                });
+            }
+        }
+
+        function mostrarPreviewMedico() {
+            const docId = document.getElementById('dentista_select').value;
+            document.getElementById('preview-placeholder').classList.add('hidden');
+            document.querySelectorAll('.medico-card').forEach(c => c.classList.add('hidden'));
+            
+            if(docId) { 
+                const card = document.getElementById('card-medico-' + docId); 
+                if(card) {
+                    card.classList.remove('hidden'); 
+                }
+                atualizarHorariosDisponiveis(); 
+            } else { 
+                document.getElementById('preview-placeholder').classList.remove('hidden'); 
+            }
+        }
+
+        // Função para ir direto ao prontuário
+        function abrirProntuario(id) {
+            showTab('historico');
+            setTimeout(() => {
+                const el = document.getElementById('consulta-' + id);
+                if(el) {
+                    el.scrollIntoView({behavior: 'smooth', block: 'center'});
+                    el.classList.add('scale-105', 'shadow-xl');
+                    setTimeout(() => el.classList.remove('scale-105', 'shadow-xl'), 1500);
+                }
+            }, 300);
+        }
+
+        const timeSelect = document.getElementById('hora_input');
+        const dateInput = document.getElementById('data_agendar');
+        
+        // --- CORREÇÃO DO FUSO HORÁRIO E DATA MÍNIMA ---
+        
+        // 1. Data Atual em Brasília (UTC-3)
+        const nowBrasilia = new Date(new Date().toLocaleString("en-US", {timeZone: "America/Sao_Paulo"}));
+        
+        // Formata YYYY-MM-DD
+        const todayStr = nowBrasilia.getFullYear() + '-' + 
+                         String(nowBrasilia.getMonth() + 1).padStart(2, '0') + '-' + 
+                         String(nowBrasilia.getDate()).padStart(2, '0');
+
+        function atualizarHorariosDisponiveis() {
+            const selectedDate = dateInput.value;
+            const selectedDoc = document.getElementById('dentista_select').value;
+            
+            // RESET ESTILOS
+            dateInput.classList.remove('blocked-input');
+            timeSelect.classList.remove('blocked-input');
+            timeSelect.disabled = false;
+
+            if(!selectedDate || !selectedDoc) return;
+
+            const medico = allDoctors.find(d => d.id === selectedDoc);
+
+            // 1. VERIFICAÇÃO DE BLOQUEIO (DATA ESPECÍFICA)
+            if (datasBloqueadasDict[selectedDoc] && datasBloqueadasDict[selectedDoc].includes(selectedDate)) {
+                dateInput.classList.add('blocked-input');
+                timeSelect.classList.add('blocked-input');
+                timeSelect.disabled = true;
+                timeSelect.innerHTML = '<option>Dia Bloqueado</option>';
+                return;
+            }
+
+            // 2. VERIFICAÇÃO DE FOLGA SEMANAL
+            const dateObj = new Date(selectedDate + "T00:00:00");
+            let dayOfWeek = dateObj.getDay(); 
+            let pyDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+
+            if (medico && medico.folga && medico.folga.split(',').includes(pyDay.toString())) {
+                dateInput.classList.add('blocked-input');
+                timeSelect.classList.add('blocked-input');
+                timeSelect.disabled = true;
+                timeSelect.innerHTML = '<option>Folga Médica</option>';
+                return;
+            }
+
+            // Recalcula hora atual de Brasília
+            const now = new Date(new Date().toLocaleString("en-US", {timeZone: "America/Sao_Paulo"}));
+            const currentHour = now.getHours();
+            
+            // Calcula "Amanhã" em Brasília
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowStr = tomorrow.getFullYear() + '-' + 
+                                String(tomorrow.getMonth() + 1).padStart(2, '0') + '-' + 
+                                String(tomorrow.getDate()).padStart(2, '0');
+
+            // 1. Reseta todos os horários para disponíveis
+            timeSelect.innerHTML = `
+                <option value="08:00">08:00</option><option value="09:00">09:00</option>
+                <option value="10:00">10:00</option><option value="11:00">11:00</option>
+                <option value="13:00">13:00</option><option value="14:00">14:00</option>
+                <option value="15:00">15:00</option><option value="16:00">16:00</option>
+                <option value="17:00">17:00</option>
+            `;
+
+            // 2. Regra das 18h: Se for depois das 18h (Brasília) e a data selecionada for AMANHÃ
+            if (selectedDate === tomorrowStr && currentHour >= 18) {
+                for(let i=0; i < timeSelect.options.length; i++) {
+                    const val = timeSelect.options[i].value;
+                    if (val === "08:00" || val === "09:00") {
+                        timeSelect.options[i].disabled = true; 
+                        timeSelect.options[i].style.color = "#ccc"; 
+                        timeSelect.options[i].innerText = val + " (Fechado/Processamento)";
+                    }
+                }
+            }
+
+            // 3. Regra do Passado (Se for HOJE, bloqueia horários anteriores à hora atual)
+            if (selectedDate === todayStr) {
+                for(let i=0; i < timeSelect.options.length; i++) {
+                    const timeValue = timeSelect.options[i].value; // ex: "08:00"
+                    const hour = parseInt(timeValue.split(':')[0]);
+                    
+                    if (hour <= currentHour) {
+                        timeSelect.options[i].disabled = true;
+                        timeSelect.options[i].style.color = "#ccc";
+                        timeSelect.options[i].innerText = timeValue + " (Passado)";
+                    }
+                }
+            }
+
+            // 4. Regra de Horários Ocupados (Banco de Dados)
+            if (selectedDate && selectedDoc) {
+                ocupados.forEach(agendamento => {
+                    if (String(agendamento.d) === String(selectedDoc) && agendamento.dt === selectedDate) {
+                        for(let i=0; i < timeSelect.options.length; i++) {
+                            if (timeSelect.options[i].value === agendamento.h) {
+                                timeSelect.options[i].disabled = true;
+                                timeSelect.options[i].style.color = "#ccc";
+                                timeSelect.options[i].innerText = timeSelect.options[i].value + " (Ocupado)";
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        if(dateInput) {
+            dateInput.min = todayStr;
+            dateInput.addEventListener('change', atualizarHorariosDisponiveis);
+        }
+
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+            document.querySelectorAll('.mobile-link').forEach(btn => btn.classList.replace('text-[#bf9b30]', 'text-gray-400'));
+        }
+
+        function ativarEdicao() {
+            ['nome', 'telefone', 'endereco', 'email'].forEach(id => {
+                const el = document.getElementById(id); if(el) { el.disabled = false; el.classList.remove('input-locked'); el.classList.add('input-editable'); }
+            });
+            document.getElementById('campo-foto').classList.remove('hidden');
+            document.getElementById('campo-senha').classList.remove('hidden');
+            document.getElementById('btn-editar').classList.add('hidden');
+            document.getElementById('btn-salvar').classList.remove('hidden');
+            document.getElementById('btn-cancelar').classList.remove('hidden');
+        }
+
+        function toggleSenha() {
+            const input = document.getElementById('senha_input');
+            const icon = document.querySelector('.fa-eye');
+            if (input.type === "password") { input.type = "text"; icon.classList.add('text-black'); }
+            else { input.type = "password"; icon.classList.remove('text-black'); }
+        }
+
+        setTimeout(() => { document.querySelectorAll('.fade-out').forEach(el => el.style.display = 'none'); }, 5000);
+    </script>
+</body>
+</html>
