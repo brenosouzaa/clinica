@@ -146,6 +146,9 @@
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 4px; }
         .tab-content.hidden { display: none !important; }
+        
+        /* Estilo Bloqueio */
+        .blocked-input { background-color: #e5e7eb !important; color: #9ca3af !important; cursor: not-allowed; border-color: #d1d5db; }
     </style>
 </head>
 
@@ -163,6 +166,7 @@
                 <button id="btn-historico" onclick="openTab('historico')" class="nav-btn w-full py-4 px-6 text-left text-xs font-bold uppercase tracking-widest rounded-xl flex items-center gap-3 {{ 'bg-luxury-gold text-white shadow-lg' if active_tab == 'historico' else 'text-gray-400 hover:bg-gray-50' }}"><i class="fas fa-file-medical-alt w-5"></i> Histórico Geral</button>
                 <button id="btn-equipe" onclick="openTab('equipe')" class="nav-btn w-full py-4 px-6 text-left text-xs font-bold uppercase tracking-widest rounded-xl flex items-center gap-3 {{ 'bg-luxury-gold text-white shadow-lg' if active_tab == 'equipe' else 'text-gray-400 hover:bg-gray-50' }}"><i class="fas fa-user-md w-5"></i> Especialistas</button>
                 <button id="btn-clinicas" onclick="openTab('clinicas')" class="nav-btn w-full py-4 px-6 text-left text-xs font-bold uppercase tracking-widest rounded-xl flex items-center gap-3 {{ 'bg-luxury-gold text-white shadow-lg' if active_tab == 'clinicas' else 'text-gray-400 hover:bg-gray-50' }}"><i class="fas fa-map-marker-alt w-5"></i> Unidades</button>
+                <button id="btn-site" onclick="openTab('site')" class="nav-btn w-full py-4 px-6 text-left text-xs font-bold uppercase tracking-widest rounded-xl flex items-center gap-3 {{ 'bg-luxury-gold text-white shadow-lg' if active_tab == 'site' else 'text-gray-400 hover:bg-gray-50' }}"><i class="fas fa-laptop-code w-5"></i> Editor Site</button>
             </nav>
         </div>
         <div class="p-8 border-t border-gray-50">
@@ -188,13 +192,10 @@
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
                 <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-luxury-gold text-white flex items-center justify-center text-xl shadow-lg shadow-luxury-gold/30"><i class="fas fa-calendar-check"></i></div><div><p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Hoje</p><h3 class="text-2xl font-bold text-luxury-black">{{ stats.hoje }}</h3></div></div>
                 <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-green-500 text-white flex items-center justify-center text-xl shadow-lg shadow-green-500/30"><i class="fas fa-check-double"></i></div><div><p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Realizadas</p><h3 class="text-2xl font-bold text-luxury-black">{{ stats.total_concluidas }}</h3></div></div>
-<div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-4">
-    <div class="w-12 h-12 rounded-full bg-blue-500 text-white flex items-center justify-center text-xl shadow-lg shadow-blue-500/30"><i class="fas fa-user-md"></i></div>
-    <div>
-        <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Equipe Ativa</p>
-        <h3 class="text-2xl font-bold text-luxury-black">{{ stats.equipe_ativa }}</h3>
-    </div>
-</div>                <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-red-500 text-white flex items-center justify-center text-xl shadow-lg shadow-red-500/30"><i class="fas fa-ban"></i></div><div><p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Canceladas</p><h3 class="text-2xl font-bold text-luxury-black">{{ stats.total_canceladas }}</h3></div></div>
+                
+                <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-blue-500 text-white flex items-center justify-center text-xl shadow-lg shadow-blue-500/30"><i class="fas fa-user-md"></i></div><div><p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Equipe Ativa</p><h3 class="text-2xl font-bold text-luxury-black">{{ stats.equipe_ativa }}</h3></div></div>
+                
+                <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-red-500 text-white flex items-center justify-center text-xl shadow-lg shadow-red-500/30"><i class="fas fa-ban"></i></div><div><p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Canceladas</p><h3 class="text-2xl font-bold text-luxury-black">{{ stats.total_canceladas }}</h3></div></div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100"><h3 class="text-sm font-bold uppercase tracking-widest text-green-600 mb-6 flex items-center gap-2"><i class="fas fa-chart-line"></i> Consultas Realizadas</h3><div class="space-y-6"><div class="flex justify-between items-center border-b border-gray-50 pb-3"><span class="text-xs text-gray-500 font-bold uppercase">Esta Semana</span><span class="text-xl font-bold text-luxury-black">{{ stats.semana_concluidas }}</span></div><div class="flex justify-between items-center border-b border-gray-50 pb-3"><span class="text-xs text-gray-500 font-bold uppercase">Este Mês</span><span class="text-xl font-bold text-luxury-black">{{ stats.mes_concluidas }}</span></div><div class="flex justify-between items-center"><span class="text-xs text-gray-500 font-bold uppercase">Este Ano</span><span class="text-xl font-bold text-luxury-black">{{ stats.ano_concluidas }}</span></div></div></div>
@@ -280,8 +281,8 @@
             </div>
         </div>
 
-        <div id="equipe" class="tab-content {{ 'hidden' if active_tab != 'equipe' else '' }}"><h2 class="text-3xl font-serif font-bold text-luxury-black mb-6">Corpo Clínico</h2><div class="bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-gray-100 mb-8"><h3 class="text-sm font-bold uppercase tracking-widest text-gold-primary mb-4">Novo Especialista</h3><form method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-4"><input type="hidden" name="acao" value="cadastrar_dentista"><input type="text" name="nome" placeholder="Nome Completo" required class="input-gold"><input type="email" name="email" placeholder="E-mail Profissional" required class="input-gold"><input type="text" name="especialidade" placeholder="Especialidade" required class="input-gold"><input type="text" name="telefone" placeholder="Telefone" class="input-gold"><select name="clinica_id" class="input-gold" required><option value="">Selecione Unidade...</option>{% for c in clinicas %}<option value="{{ c.id }}">{{ c.nome }}</option>{% endfor %}</select><input type="password" name="senha" placeholder="Senha Provisória" value="123456" required class="input-gold"><button class="md:col-span-2 bg-luxury-black text-white py-3 rounded-lg font-bold uppercase text-xs hover:bg-luxury-gold transition mt-2">Contratar Especialista</button></form></div><div class="grid grid-cols-1 md:grid-cols-3 gap-6">{% for d in dentistas %}<div class="bg-white p-6 rounded-[2rem] border border-gray-100 flex items-center justify-between"><div class="flex items-center gap-4"><img src="{{ d.foto_perfil if d.foto_perfil else 'https://cdn-icons-png.flaticon.com/512/3774/3774299.png' }}" class="w-12 h-12 rounded-full object-cover border border-gray-100"><div><h4 class="font-bold text-sm">{{ d.nome }}</h4><p class="text-xs text-gray-400">{{ d.especialidade }}</p></div></div><form method="POST" onsubmit="return confirm('Demitir?');"><input type="hidden" name="acao" value="excluir_user"><input type="hidden" name="tipo_user" value="dentista"><input type="hidden" name="id_user" value="{{ d.id }}"><button class="text-gray-300 hover:text-red-500"><i class="fas fa-user-times"></i></button></form></div>{% endfor %}</div></div>
-        <div id="clinicas" class="tab-content {{ 'hidden' if active_tab != 'clinicas' else '' }}"><h2 class="text-3xl font-serif font-bold text-luxury-black mb-6">Unidades</h2><div class="bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-gray-100 mb-8"><h3 class="text-sm font-bold uppercase tracking-widest text-gold-primary mb-4">Nova Unidade</h3><form method="POST" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end"><input type="hidden" name="acao" value="nova_clinica"><div><label class="text-[10px] font-bold text-gray-400 uppercase">Nome</label><input type="text" name="nome" required class="input-gold"></div><div><label class="text-[10px] font-bold text-gray-400 uppercase">Bairro</label><input type="text" name="bairro" required class="input-gold"></div><div><label class="text-[10px] font-bold text-gray-400 uppercase">Endereço</label><input type="text" name="endereco" required class="input-gold"></div><div><label class="text-[10px] font-bold text-gray-400 uppercase">Telefone</label><input type="text" name="telefone" required class="input-gold"></div><button class="bg-luxury-black text-white h-[46px] rounded-lg font-bold uppercase text-xs hover:bg-luxury-gold transition lg:col-span-4 mt-2">Adicionar Unidade</button></form></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{% for clinica in clinicas %}<div class="bg-white p-6 rounded-[2rem] border border-gray-100 relative group hover:shadow-lg transition"><div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition"><form method="POST" onsubmit="return confirm('Excluir?');"><input type="hidden" name="acao" value="excluir_clinica"><input type="hidden" name="id_clinica" value="{{ clinica.id }}"><button class="text-red-300 hover:text-red-600 bg-red-50 p-2 rounded-full"><i class="fas fa-trash-alt"></i></button></form></div><h4 class="font-bold text-lg mb-1">{{ clinica.nome }}</h4><span class="bg-luxury-gold/10 text-luxury-gold text-[10px] font-bold px-2 py-0.5 rounded uppercase">{{ clinica.bairro }}</span><div class="mt-4 space-y-2 text-sm text-gray-500"><p><i class="fas fa-map-marker-alt w-5 text-center"></i> {{ clinica.endereco_completo }}</p><p><i class="fas fa-phone w-5 text-center"></i> {{ clinica.telefone }}</p></div></div>{% endfor %}</div></div>
+        <div id="equipe" class="tab-content {{ 'hidden' if active_tab != 'equipe' else '' }}"><h2 class="text-3xl font-serif font-bold text-luxury-black mb-6">Corpo Clínico</h2><div class="bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-gray-100 mb-8"><h3 class="text-sm font-bold uppercase tracking-widest text-gold-primary mb-4">Novo Especialista</h3><form method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-4"><input type="hidden" name="acao" value="cadastrar_dentista"><input type="text" name="nome" placeholder="Nome Completo" required class="input-gold"><input type="email" name="email" placeholder="E-mail Profissional" required class="input-gold"><input type="text" name="especialidade" placeholder="Especialidade" required class="input-gold"><input type="text" name="telefone" placeholder="Telefone" class="input-gold"><select name="clinica_id" class="input-gold" required><option value="">Selecione Unidade...</option>{% for c in clinicas %}<option value="{{ c.id }}">{{ c.nome }}</option>{% endfor %}</select><input type="password" name="senha" placeholder="Senha Provisória" value="123456" required class="input-gold"><button class="md:col-span-2 bg-luxury-black text-white py-3 rounded-lg font-bold uppercase text-xs hover:bg-luxury-gold transition mt-2">Contratar Especialista</button></form></div><div class="grid grid-cols-1 md:grid-cols-3 gap-6">{% for d in dentistas %}<div class="bg-white p-6 rounded-[2rem] border border-gray-100 flex items-center justify-between"><div class="flex items-center gap-4"><img src="{{ d.foto_perfil if d.foto_perfil else 'https://cdn-icons-png.flaticon.com/512/3774/3774299.png' }}" class="w-12 h-12 rounded-full object-cover border border-gray-100"><div><h4 class="font-bold text-sm">{{ d.nome }}</h4><p class="text-xs text-gray-400">{{ d.especialidade }}</p></div></div><button onclick="abrirModalExclusao('excluir_user', '{{ d.id }}')" type="button" class="text-gray-300 hover:text-red-500"><i class="fas fa-user-times"></i></button></div>{% endfor %}</div></div>
+        <div id="clinicas" class="tab-content {{ 'hidden' if active_tab != 'clinicas' else '' }}"><h2 class="text-3xl font-serif font-bold text-luxury-black mb-6">Unidades</h2><div class="bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-gray-100 mb-8"><h3 class="text-sm font-bold uppercase tracking-widest text-gold-primary mb-4">Nova Unidade</h3><form method="POST" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end"><input type="hidden" name="acao" value="nova_clinica"><div><label class="text-[10px] font-bold text-gray-400 uppercase">Nome</label><input type="text" name="nome" required class="input-gold"></div><div><label class="text-[10px] font-bold text-gray-400 uppercase">Bairro</label><input type="text" name="bairro" required class="input-gold"></div><div><label class="text-[10px] font-bold text-gray-400 uppercase">Endereço</label><input type="text" name="endereco" required class="input-gold"></div><div><label class="text-[10px] font-bold text-gray-400 uppercase">Telefone</label><input type="text" name="telefone" required class="input-gold"></div><button class="bg-luxury-black text-white h-[46px] rounded-lg font-bold uppercase text-xs hover:bg-luxury-gold transition lg:col-span-4 mt-2">Adicionar Unidade</button></form></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{% for clinica in clinicas %}<div class="bg-white p-6 rounded-[2rem] border border-gray-100 relative group hover:shadow-lg transition"><div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition"><button onclick="abrirModalExclusao('excluir_clinica', '{{ clinica.id }}')" type="button" class="text-red-300 hover:text-red-600 bg-red-50 p-2 rounded-full"><i class="fas fa-trash-alt"></i></button></div><h4 class="font-bold text-lg mb-1">{{ clinica.nome }}</h4><span class="bg-luxury-gold/10 text-luxury-gold text-[10px] font-bold px-2 py-0.5 rounded uppercase">{{ clinica.bairro }}</span><div class="mt-4 space-y-2 text-sm text-gray-500"><p><i class="fas fa-map-marker-alt w-5 text-center"></i> {{ clinica.endereco_completo }}</p><p><i class="fas fa-phone w-5 text-center"></i> {{ clinica.telefone }}</p></div></div>{% endfor %}</div></div>
         
         <div id="site" class="tab-content {{ 'hidden' if active_tab != 'site' else '' }}">
             <h2 class="text-3xl font-serif font-bold text-luxury-black mb-6">Editor do Site</h2>
@@ -289,42 +290,30 @@
                 <input type="hidden" name="acao" value="config_site">
 
                 <div>
-                    <h3 class="text-sm font-bold uppercase tracking-widest text-gold-primary mb-4 border-b border-gray-100 pb-2">Banner Principal</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div><label class="text-[10px] font-bold text-gray-400 uppercase">Título Principal</label><input type="text" name="titulo_principal" value="{{ config.titulo_principal }}" class="input-gold"></div>
-                        <div><label class="text-[10px] font-bold text-gray-400 uppercase">Texto Destaque (Dourado)</label><input type="text" name="titulo_destaque" value="{{ config.titulo_destaque }}" class="input-gold"></div>
-                        <div class="md:col-span-2"><label class="text-[10px] font-bold text-gray-400 uppercase">Subtítulo</label><textarea name="subtitulo" rows="2" class="input-gold">{{ config.subtitulo }}</textarea></div>
-                        <div class="md:col-span-2">
-                            <label class="text-[10px] font-bold text-gray-400 uppercase">Imagem de Fundo do Banner</label>
-                            <input type="file" name="img_agendamento" class="input-gold pt-2 text-xs">
-                            <p class="text-[9px] text-gray-400 mt-1">Recomendado: 1920x1080px</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <h3 class="text-sm font-bold uppercase tracking-widest text-gold-primary mb-4 border-b border-gray-100 pb-2">Seções Internas</h3>
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-gold-primary mb-4 border-b border-gray-100 pb-2">Fotos da Home</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="text-[10px] font-bold text-gray-400 uppercase">Foto da Equipe/Especialistas</label>
-                            <input type="file" name="img_especialistas" class="input-gold pt-2 text-xs">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-400 uppercase">Foto "Sua Próxima Visita"</label>
+                            <label class="text-[10px] font-bold text-gray-400 uppercase">Foto: Sua Próxima Visita</label>
                             <input type="file" name="img_visita" class="input-gold pt-2 text-xs">
                         </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-400 uppercase">Foto: Ver Equipe</label>
+                            <input type="file" name="img_especialistas" class="input-gold pt-2 text-xs">
+                        </div>
                     </div>
                 </div>
 
                 <div>
-                    <h3 class="text-sm font-bold uppercase tracking-widest text-gold-primary mb-4 border-b border-gray-100 pb-2">Rodapé / Mapa</h3>
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-gold-primary mb-4 border-b border-gray-100 pb-2">Dados do Rodapé</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div><label class="text-[10px] font-bold text-gray-400 uppercase">Título Seção Mapa</label><input type="text" name="titulo_mapa" value="{{ config.titulo_mapa }}" class="input-gold"></div>
-                        <div><label class="text-[10px] font-bold text-gray-400 uppercase">Descrição Seção Mapa</label><textarea name="desc_mapa" rows="2" class="input-gold">{{ config.desc_mapa }}</textarea></div>
+                        <div><label class="text-[10px] font-bold text-gray-400 uppercase">Telefone</label><input type="text" name="rodape_tel" value="{{ config.rodape_tel }}" class="input-gold"></div>
+                        <div><label class="text-[10px] font-bold text-gray-400 uppercase">Email</label><input type="text" name="rodape_email" value="{{ config.rodape_email }}" class="input-gold"></div>
+                        <div class="md:col-span-2"><label class="text-[10px] font-bold text-gray-400 uppercase">Descrição da Marca</label><textarea name="rodape_desc" rows="2" class="input-gold">{{ config.rodape_desc }}</textarea></div>
+                        <div class="md:col-span-2"><label class="text-[10px] font-bold text-gray-400 uppercase">Endereço / Copy</label><input type="text" name="rodape_copy" value="{{ config.rodape_copy }}" class="input-gold"></div>
                     </div>
                 </div>
 
-                <button class="bg-luxury-black text-white px-8 py-4 rounded-xl font-bold uppercase text-xs hover:bg-luxury-gold transition shadow-lg w-full md:w-auto">Salvar Todas as Alterações</button>
+                <button class="bg-luxury-black text-white px-8 py-4 rounded-xl font-bold uppercase text-xs hover:bg-luxury-gold transition shadow-lg w-full md:w-auto">Salvar Alterações</button>
             </form>
         </div>
 
@@ -401,13 +390,39 @@
     <script>
         const allDentistas = {{ dentistas_js | tojson }};
         const ocupadosAdmin = {{ ocupados_admin | tojson }};
+        
+        // Passa folgas para o JS (Fixas e Bloqueios)
+        // Precisamos tratar a lista para que o JS entenda
+        const folgasPorDentista = {};
+        {% for d in dentistas %}
+            folgasPorDentista["{{ d.id }}"] = {
+                fixas: "{{ d.dia_folga_semanal if d.dia_folga_semanal else '' }}",
+                bloqueios: [
+                    {% for f in d.folgas %}
+                        "{{ f.data.strftime('%Y-%m-%d') }}",
+                    {% endfor %}
+                ]
+            };
+        {% endfor %}
+
+        // CORREÇÃO DATA LOCAL (FUSO BRASÍLIA)
+        const nowBrasilia = new Date(new Date().toLocaleString("en-US", {timeZone: "America/Sao_Paulo"}));
+        
+        const year = nowBrasilia.getFullYear();
+        const month = String(nowBrasilia.getMonth() + 1).padStart(2, '0');
+        const day = String(nowBrasilia.getDate()).padStart(2, '0');
+        const todayISO = `${year}-${month}-${day}`; 
 
         document.addEventListener("DOMContentLoaded", function() {
             const activeTab = "{{ active_tab }}";
             if (activeTab) openTab(activeTab);
-            const todayStr = new Date().toISOString().split('T')[0];
+            
+            // Define data mínima como HOJE DE BRASÍLIA
             const dataInput = document.getElementById('data_agenda');
-            if(dataInput) dataInput.setAttribute('min', todayStr);
+            if(dataInput) dataInput.setAttribute('min', todayISO);
+            
+            // Ativa validação inicial
+            filtrarMedicosAgenda(); // Para carregar dentistas da primeira clínica
         });
 
         function filtrarMedicosAgenda() {
@@ -415,31 +430,107 @@
             const docSelect = document.getElementById('dentista_agenda');
             docSelect.innerHTML = '<option value="">Selecione o Médico...</option>';
             docSelect.disabled = false;
+            
             allDentistas.filter(d => d.clinica_id == clinicaId).forEach(d => {
                 let opt = document.createElement('option'); opt.value = d.id; opt.innerText = d.nome; docSelect.appendChild(opt);
             });
+            atualizarHorariosAgenda(); // Limpa horários ao mudar clínica
         }
 
         function atualizarHorariosAgenda() {
             const dataInput = document.getElementById('data_agenda');
             const docSelect = document.getElementById('dentista_agenda');
             const timeSelect = document.getElementById('hora_agenda');
+            
+            if(!dataInput || !docSelect || !timeSelect) return;
+
             const selectedDate = dataInput.value;
             const selectedDoc = docSelect.value;
-            for(let i=0; i < timeSelect.options.length; i++) {
-                timeSelect.options[i].disabled = false; timeSelect.options[i].style.color = "#000"; timeSelect.options[i].innerText = timeSelect.options[i].value.replace(" (Ocupado)", "");
+            
+            // RESET ESTILOS
+            dataInput.classList.remove('blocked-input');
+            timeSelect.classList.remove('blocked-input');
+            timeSelect.disabled = false;
+            
+            // 1. Recria opções originais
+            timeSelect.innerHTML = `
+                <option value="08:00">08:00</option><option value="09:00">09:00</option>
+                <option value="10:00">10:00</option><option value="11:00">11:00</option>
+                <option value="13:00">13:00</option><option value="14:00">14:00</option>
+                <option value="15:00">15:00</option><option value="16:00">16:00</option>
+                <option value="17:00">17:00</option>
+            `;
+
+            if (!selectedDate || !selectedDoc) return;
+            
+            // 2. VERIFICAÇÃO DE BLOQUEIO (DATA ESPECÍFICA)
+            if (folgasPorDentista[selectedDoc] && folgasPorDentista[selectedDoc].bloqueios.includes(selectedDate)) {
+                dataInput.classList.add('blocked-input');
+                timeSelect.classList.add('blocked-input');
+                timeSelect.disabled = true;
+                timeSelect.innerHTML = '<option>Dia Bloqueado</option>';
+                return;
             }
-            if (selectedDate && selectedDoc) {
-                ocupadosAdmin.forEach(ag => {
-                    if (String(ag.d) === String(selectedDoc) && ag.dt === selectedDate) {
-                        for(let i=0; i < timeSelect.options.length; i++) {
-                            if (timeSelect.options[i].value.substring(0, 5) === ag.h) {
-                                timeSelect.options[i].disabled = true; timeSelect.options[i].style.color = "#ccc"; timeSelect.options[i].innerText = timeSelect.options[i].value.substring(0, 5) + " (Ocupado)";
-                            }
+
+            // 3. VERIFICAÇÃO DE FOLGA SEMANAL
+            const dateObj = new Date(selectedDate + "T00:00:00");
+            let dayOfWeek = dateObj.getDay(); 
+            let pyDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+
+            if (folgasPorDentista[selectedDoc] && folgasPorDentista[selectedDoc].fixas.split(',').includes(pyDay.toString())) {
+                dataInput.classList.add('blocked-input');
+                timeSelect.classList.add('blocked-input');
+                timeSelect.disabled = true;
+                timeSelect.innerHTML = '<option>Folga Médica</option>';
+                return;
+            }
+
+            // 4. Lógica de Horários (Passado / 18h)
+            const now = new Date(new Date().toLocaleString("en-US", {timeZone: "America/Sao_Paulo"}));
+            const currentHour = now.getHours();
+            
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowStr = tomorrow.getFullYear() + '-' + 
+                                String(tomorrow.getMonth() + 1).padStart(2, '0') + '-' + 
+                                String(tomorrow.getDate()).padStart(2, '0');
+
+            // Regra do Passado (Se for HOJE)
+            if(selectedDate === todayISO) {
+                 for(let i=0; i < timeSelect.options.length; i++) {
+                    const val = parseInt(timeSelect.options[i].value.split(':')[0]); 
+                    if (val <= currentHour) {
+                        timeSelect.options[i].disabled = true;
+                        timeSelect.options[i].style.color = "#ccc";
+                        timeSelect.options[i].innerText += " (Passado)";
+                    }
+                }
+            }
+
+            // Regra das 18h (Se for AMANHÃ)
+            if(selectedDate === tomorrowStr && currentHour >= 18) {
+                for(let i=0; i < timeSelect.options.length; i++) {
+                    const val = timeSelect.options[i].value;
+                    if(val === "08:00" || val === "09:00") {
+                        timeSelect.options[i].disabled = true;
+                        timeSelect.options[i].style.color = "#ccc";
+                        timeSelect.options[i].innerText += " (Fechado)";
+                    }
+                }
+            }
+            
+            // 5. BLOQUEIO DE OCUPADOS (BANCO DE DADOS)
+            ocupadosAdmin.forEach(ag => {
+                if (String(ag.d) === String(selectedDoc) && ag.dt === selectedDate) {
+                    for(let i=0; i < timeSelect.options.length; i++) {
+                        if (timeSelect.options[i].value.substring(0, 5) === ag.h) {
+                            timeSelect.options[i].disabled = true; 
+                            timeSelect.options[i].style.color = "#ccc"; 
+                            timeSelect.options[i].innerText = timeSelect.options[i].value.substring(0, 5) + " (Ocupado)";
                         }
                     }
-                });
-            }
+                }
+            });
         }
         
         function fecharModalWpp() {
