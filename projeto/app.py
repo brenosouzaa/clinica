@@ -25,10 +25,13 @@ if 'PYTHONANYWHERE_DOMAIN' in os.environ:
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'instance', 'database.db')
 else:
     # PostgreSQL para produção ou fallback local
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
-        'DATABASE_URL', 
-        'postgresql://postgres:123789ab@localhost/clinica'
-    )
+    db_url = os.environ.get('DATABASE_URL', 'postgresql://postgres:123789ab@localhost/clinica')
+    
+    # Corrige a URL do Render automaticamente caso comece com postgres:// (sem o ql)
+    if db_url.startswith("postgres://"):
+        db_url = db_url.replace("postgres://", "postgresql://", 1)
+        
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_key')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
