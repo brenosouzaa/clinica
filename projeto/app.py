@@ -96,3 +96,7 @@ with app.app_context():
 if __name__ == '__main__':
     # Em produção, o Gunicorn irá executar o app
     app.run(debug=True, host='0.0.0.0', port=5000)
+with app.app_context():
+    db.drop_all()    # APAGA todas as tabelas antigas
+    db.create_all() 
+     # CRIA as tabelas novamente com a coluna nova
