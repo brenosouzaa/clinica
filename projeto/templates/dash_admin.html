@@ -145,6 +145,8 @@
         body { background-color: #f8f8f8; padding-bottom: 80px; }
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 4px; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         .tab-content.hidden { display: none !important; }
         
         /* Estilo Bloqueio */
@@ -204,7 +206,12 @@
         </div>
 
         <div id="historico" class="tab-content {{ 'hidden' if active_tab != 'historico' else '' }}">
-            <div class="flex flex-col md:flex-row justify-between items-end mb-8 gap-4"><div><h2 class="text-3xl font-serif font-bold text-luxury-black">Histórico Geral</h2><p class="text-gray-400 text-sm mt-1">Busque prontuários completos.</p></div></div>
+            <div class="flex flex-col md:flex-row justify-between items-center md:items-end text-center md:text-left mb-8 gap-4">
+                <div class="w-full">
+                    <h2 class="text-3xl font-serif font-bold text-luxury-black">Histórico Geral</h2>
+                    <p class="text-gray-400 text-sm mt-1">Busque prontuários completos.</p>
+                </div>
+            </div>
             <form method="GET" class="bg-white p-6 rounded-[2rem] shadow-lg border border-gray-100 mb-8"><input type="hidden" name="tab" value="historico">
                 <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-4 items-end">
                     <div class="md:col-span-1"><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Paciente (Nome/ID/Email)</label><input type="text" name="busca_paciente" class="input-gold" placeholder="Digite..." value="{{ request.args.get('busca_paciente', '') }}"></div>
@@ -319,11 +326,13 @@
 
     </main>
 
-    <nav class="md:hidden fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around py-3 z-50">
-        <button id="mob-dashboard" onclick="openTab('dashboard')" class="mobile-link text-gray-400 flex flex-col items-center"><i class="fas fa-chart-pie text-lg"></i><span class="text-[9px] font-bold mt-1">Dash</span></button>
-        <button id="mob-agenda" onclick="openTab('agenda')" class="mobile-link text-gray-400 flex flex-col items-center"><i class="far fa-calendar-alt text-lg"></i><span class="text-[9px] font-bold mt-1">Agenda</span></button>
-        <button id="mob-historico" onclick="openTab('historico')" class="mobile-link text-gray-400 flex flex-col items-center"><i class="fas fa-file-medical-alt text-lg"></i><span class="text-[9px] font-bold mt-1">Histórico</span></button>
-        <button id="mob-equipe" onclick="openTab('equipe')" class="mobile-link text-gray-400 flex flex-col items-center"><i class="fas fa-user-md text-lg"></i><span class="text-[9px] font-bold mt-1">Equipe</span></button>
+    <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 flex overflow-x-auto scrollbar-hide justify-between px-4 py-3 z-50 space-x-6">
+        <button id="mob-dashboard" onclick="openTab('dashboard')" class="mobile-link text-gray-400 flex flex-col items-center shrink-0"><i class="fas fa-chart-pie text-lg"></i><span class="text-[9px] font-bold mt-1">Dash</span></button>
+        <button id="mob-agenda" onclick="openTab('agenda')" class="mobile-link text-gray-400 flex flex-col items-center shrink-0"><i class="far fa-calendar-alt text-lg"></i><span class="text-[9px] font-bold mt-1">Agenda</span></button>
+        <button id="mob-historico" onclick="openTab('historico')" class="mobile-link text-gray-400 flex flex-col items-center shrink-0"><i class="fas fa-file-medical-alt text-lg"></i><span class="text-[9px] font-bold mt-1">Histórico</span></button>
+        <button id="mob-equipe" onclick="openTab('equipe')" class="mobile-link text-gray-400 flex flex-col items-center shrink-0"><i class="fas fa-user-md text-lg"></i><span class="text-[9px] font-bold mt-1">Equipe</span></button>
+        <button id="mob-clinicas" onclick="openTab('clinicas')" class="mobile-link text-gray-400 flex flex-col items-center shrink-0"><i class="fas fa-map-marker-alt text-lg"></i><span class="text-[9px] font-bold mt-1">Unidades</span></button>
+        <button id="mob-site" onclick="openTab('site')" class="mobile-link text-gray-400 flex flex-col items-center shrink-0"><i class="fas fa-laptop-code text-lg"></i><span class="text-[9px] font-bold mt-1">Site</span></button>
     </nav>
 
     <div id="modal-prontuario" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
