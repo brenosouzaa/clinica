@@ -62,6 +62,9 @@
                 <a onclick="showTab('perfil')" class="cursor-pointer block p-3 px-4 text-sm font-medium text-gray-500 hover:text-black hover:bg-gray-50 rounded-lg transition flex items-center gap-3 desktop-link">
                     <i class="fas fa-user-edit w-4 text-center"></i> Meus Dados
                 </a>
+                <a onclick="showTab('seguranca')" class="cursor-pointer block p-3 px-4 text-sm font-medium text-gray-500 hover:text-black hover:bg-gray-50 rounded-lg transition flex items-center gap-3 desktop-link">
+                    <i class="fas fa-shield-alt w-4 text-center"></i> Segurança
+                </a>
             </nav>
         </div>
         <div class="p-6 border-t border-gray-50">
@@ -349,7 +352,7 @@
             <div class="flex justify-between items-end mb-8">
                 <div>
                     <h2 class="text-2xl font-serif font-bold text-gray-900">Meu Perfil</h2>
-                    <p class="text-sm text-gray-500">Gerencie seus dados pessoais e credenciais.</p>
+                    <p class="text-sm text-gray-500">Gerencie seus dados pessoais.</p>
                 </div>
             </div>
 
@@ -375,7 +378,7 @@
                 <div class="lg:col-span-2">
                     <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
                         <div class="p-8 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
-                            <h3 class="font-bold text-gray-900">Ficha Cadastral</h3>
+                            <h3 class="font-bold text-gray-900"><i class="fas fa-id-card text-[#bf9b30] mr-2"></i> Ficha Cadastral</h3>
                             <button type="button" id="btn-editar" onclick="ativarEdicao()" class="text-[10px] font-bold uppercase tracking-widest text-black bg-white border border-gray-200 shadow-sm px-4 py-2 rounded-lg hover:border-black transition flex items-center gap-2">
                                 <i class="fas fa-pencil-alt text-[#bf9b30]"></i> Editar Dados
                             </button>
@@ -387,32 +390,40 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label class="block text-[10px] font-bold uppercase text-gray-400 mb-2 tracking-widest">Nome Completo</label>
-                                    <input type="text" name="nome" id="nome" value="{{ current_user.nome }}" required disabled class="input-locked w-full text-sm outline-none">
+                                    <input type="text" name="nome" id="nome" value="{{ current_user.nome }}" required disabled class="input-locked w-full text-sm outline-none border-b border-transparent focus:border-[#bf9b30] pb-2">
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-bold uppercase text-gray-400 mb-2 tracking-widest">Endereço de E-mail</label>
-                                    <input type="email" name="email" id="email" value="{{ current_user.email }}" required disabled class="input-locked w-full text-sm outline-none">
+                                    <input type="email" name="email" id="email" value="{{ current_user.email }}" required disabled class="input-locked w-full text-sm outline-none border-b border-transparent focus:border-[#bf9b30] pb-2">
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-gray-50">
                                 <div>
                                     <label class="block text-[10px] font-bold uppercase text-gray-400 mb-2 tracking-widest">WhatsApp</label>
-                                    <input type="text" name="telefone" id="telefone" value="{{ current_user.telefone or '' }}" required disabled class="input-locked w-full text-sm outline-none">
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-2 tracking-widest">Endereço</label>
-                                    <input type="text" name="endereco" id="endereco" value="{{ current_user.endereco or '' }}" required disabled class="input-locked w-full text-sm outline-none placeholder-gray-300" placeholder="Informe seu endereço completo">
+                                    <input type="text" name="telefone" id="telefone" value="{{ current_user.telefone or '' }}" required disabled class="input-locked w-full text-sm outline-none border-b border-transparent focus:border-[#bf9b30] pb-2">
                                 </div>
                             </div>
-                            
-                            <div id="campo-senha" class="hidden pt-6 border-t border-gray-50">
-                                <label class="block text-[10px] font-bold uppercase text-gray-400 mb-2 tracking-widest">Alterar Senha de Acesso</label>
-                                <div class="relative max-w-sm">
-                                    <input type="password" name="senha" id="senha_input" minlength="6" placeholder="Mínimo de 6 caracteres" class="w-full bg-white border border-gray-200 rounded-lg p-3 text-sm outline-none focus:border-[#bf9b30] transition pr-10 shadow-sm">
-                                    <i class="fas fa-eye absolute right-4 top-3.5 text-gray-400 cursor-pointer hover:text-black transition" onclick="toggleSenha()"></i>
+
+                            <div class="pt-6 border-t border-gray-50">
+                                <label class="block text-[10px] font-bold uppercase text-gray-400 mb-4 tracking-widest">Endereço Residencial</label>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="md:col-span-1">
+                                        <input type="text" name="cep" id="cep" value="{{ current_user.cep or '' }}" required disabled class="input-locked w-full text-sm outline-none placeholder-gray-400 border-b border-transparent focus:border-[#bf9b30] pb-2" placeholder="CEP" onblur="buscarCEP(this.value)">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <input type="text" name="rua" id="rua" value="{{ current_user.rua or '' }}" required disabled class="input-locked w-full text-sm outline-none placeholder-gray-400 border-b border-transparent focus:border-[#bf9b30] pb-2" placeholder="Rua / Avenida">
+                                    </div>
+                                    <div class="md:col-span-1">
+                                        <input type="text" name="numero" id="numero" value="{{ current_user.numero or '' }}" disabled class="input-locked w-full text-sm outline-none placeholder-gray-400 border-b border-transparent focus:border-[#bf9b30] pb-2" placeholder="Número (Opcional)">
+                                    </div>
+                                    <div class="md:col-span-1">
+                                        <input type="text" name="bairro" id="bairro" value="{{ current_user.bairro or '' }}" required disabled class="input-locked w-full text-sm outline-none placeholder-gray-400 border-b border-transparent focus:border-[#bf9b30] pb-2" placeholder="Bairro">
+                                    </div>
+                                    <div class="md:col-span-1">
+                                        <input type="text" name="estado" id="estado" value="{{ current_user.estado or '' }}" required disabled class="input-locked w-full text-sm outline-none placeholder-gray-400 border-b border-transparent focus:border-[#bf9b30] pb-2" placeholder="Estado (UF)">
+                                    </div>
                                 </div>
-                                <p class="text-[9px] text-gray-400 mt-2">*Deixe em branco caso não queira alterar sua senha atual.</p>
                             </div>
                             
                             <div id="campo-foto" class="hidden pt-6 border-t border-gray-50">
@@ -432,13 +443,54 @@
                 </div>
             </div>
         </div>
+
+        <div id="seguranca" class="tab-content hidden">
+            <div class="flex justify-between items-end mb-8">
+                <div>
+                    <h2 class="text-2xl font-serif font-bold text-gray-900">Segurança</h2>
+                    <p class="text-sm text-gray-500">Altere sua senha de acesso ao portal.</p>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden max-w-2xl mx-auto">
+                <div class="p-8 border-b border-gray-50 bg-gray-50/50">
+                    <h3 class="font-bold text-gray-900"><i class="fas fa-shield-alt text-[#bf9b30] mr-2"></i> Alterar Senha</h3>
+                </div>
+                
+                <form method="POST" class="p-8 space-y-6" onsubmit="return validarSenha(event)">
+                    <input type="hidden" name="acao" value="alterar_senha">
+                    
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-gray-400 mb-2 tracking-widest">Nova Senha</label>
+                        <div class="relative">
+                            <input type="password" name="nova_senha" id="nova_senha" minlength="6" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm outline-none focus:border-[#bf9b30] transition pr-10 shadow-sm" placeholder="Mínimo de 6 caracteres">
+                            <i class="fas fa-eye absolute right-4 top-3.5 text-gray-400 cursor-pointer hover:text-black transition" onclick="toggleVisibility('nova_senha', this)"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-gray-400 mb-2 tracking-widest">Confirmar Nova Senha</label>
+                        <div class="relative">
+                            <input type="password" name="confirmar_senha" id="confirmar_senha" minlength="6" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm outline-none focus:border-[#bf9b30] transition pr-10 shadow-sm" placeholder="Repita a nova senha">
+                            <i class="fas fa-eye absolute right-4 top-3.5 text-gray-400 cursor-pointer hover:text-black transition" onclick="toggleVisibility('confirmar_senha', this)"></i>
+                        </div>
+                        <p id="senha-error" class="text-red-500 text-xs mt-2 hidden">As senhas não coincidem. Tente novamente.</p>
+                    </div>
+                    
+                    <div class="pt-4">
+                        <button type="submit" class="w-full md:w-auto px-8 py-3 bg-black rounded-lg text-xs font-bold text-white hover:bg-[#bf9b30] transition shadow-lg uppercase tracking-widest">Atualizar Senha</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </main>
 
-    <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur shadow-2xl z-50 flex justify-around py-3 border-t border-gray-100">
-        <button onclick="showTab('home')" class="mobile-link text-[#bf9b30] flex flex-col items-center"><i class="fas fa-home text-lg"></i> <span class="text-[9px] font-bold uppercase">Início</span></button>
-        <button onclick="showTab('agendar')" class="mobile-link text-gray-400 flex flex-col items-center"><i class="fas fa-calendar-plus text-lg"></i> <span class="text-[9px] font-bold uppercase">Agendar</span></button>
-        <button onclick="showTab('historico')" class="mobile-link text-gray-400 flex flex-col items-center"><i class="fas fa-file-medical text-lg"></i> <span class="text-[9px] font-bold uppercase">Hist.</span></button>
-        <button onclick="showTab('perfil')" class="mobile-link text-gray-400 flex flex-col items-center"><i class="fas fa-user-md text-lg"></i> <span class="text-[9px] font-bold uppercase">Perfil</span></button>
+    <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur shadow-2xl z-50 flex overflow-x-auto scrollbar-hide justify-between px-4 py-3 border-t border-gray-100 space-x-6">
+        <button onclick="showTab('home')" class="mobile-link text-[#bf9b30] flex flex-col items-center shrink-0"><i class="fas fa-home text-lg"></i> <span class="text-[9px] font-bold uppercase mt-1">Início</span></button>
+        <button onclick="showTab('agendar')" class="mobile-link text-gray-400 flex flex-col items-center shrink-0"><i class="fas fa-calendar-plus text-lg"></i> <span class="text-[9px] font-bold uppercase mt-1">Agendar</span></button>
+        <button onclick="showTab('historico')" class="mobile-link text-gray-400 flex flex-col items-center shrink-0"><i class="fas fa-file-medical text-lg"></i> <span class="text-[9px] font-bold uppercase mt-1">Hist.</span></button>
+        <button onclick="showTab('perfil')" class="mobile-link text-gray-400 flex flex-col items-center shrink-0"><i class="fas fa-user-md text-lg"></i> <span class="text-[9px] font-bold uppercase mt-1">Perfil</span></button>
+        <button onclick="showTab('seguranca')" class="mobile-link text-gray-400 flex flex-col items-center shrink-0"><i class="fas fa-lock text-lg"></i> <span class="text-[9px] font-bold uppercase mt-1">Senha</span></button>
     </nav>
 
     <script>
@@ -591,7 +643,6 @@
                     const hour = parseInt(timeValue.split(':')[0]);
                     
                     // Bloqueia 08:00 e 09:00 se a marcação for antes das 08h da manhã do próprio dia 
-                    // (previne marcações em que a clínica não teve tempo hábil de abrir e checar agenda)
                     if (currentHour < 8 && (hour === 8 || hour === 9)) {
                         timeSelect.options[i].disabled = true;
                         timeSelect.options[i].style.color = "#ccc";
@@ -630,30 +681,92 @@
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(tabId).classList.remove('hidden');
-            document.querySelectorAll('.mobile-link').forEach(btn => btn.classList.replace('text-[#bf9b30]', 'text-gray-400'));
+            
+            // Lógica Desktop Links
+            document.querySelectorAll('.desktop-link').forEach(btn => {
+                btn.classList.remove('text-black', 'bg-gray-50');
+                btn.classList.add('text-gray-500');
+                if(btn.getAttribute('onclick').includes(tabId)) {
+                    btn.classList.add('text-black', 'bg-gray-50');
+                    btn.classList.remove('text-gray-500');
+                }
+            });
+            
+            // Lógica Mobile Links
+            document.querySelectorAll('.mobile-link').forEach(btn => {
+                btn.classList.replace('text-[#bf9b30]', 'text-gray-400');
+                if(btn.getAttribute('onclick').includes(tabId)) {
+                    btn.classList.replace('text-gray-400', 'text-[#bf9b30]');
+                }
+            });
         }
 
         function ativarEdicao() {
-            ['nome', 'telefone', 'endereco', 'email'].forEach(id => {
+            ['nome', 'telefone', 'cep', 'rua', 'numero', 'bairro', 'estado', 'email'].forEach(id => {
                 const el = document.getElementById(id); 
                 if(el) { 
                     el.disabled = false; 
                     el.classList.remove('input-locked'); 
                     el.classList.add('input-editable'); 
+                    
+                    // Remove borders applied manually for locked view
+                    if(el.classList.contains('border-transparent')) {
+                        el.classList.remove('border-transparent');
+                        el.classList.add('border-gray-200');
+                    }
                 }
             });
             document.getElementById('campo-foto').classList.remove('hidden');
-            document.getElementById('campo-senha').classList.remove('hidden');
             document.getElementById('btn-editar').classList.add('hidden');
             document.getElementById('btn-salvar').classList.remove('hidden');
             document.getElementById('btn-cancelar').classList.remove('hidden');
         }
 
-        function toggleSenha() {
-            const input = document.getElementById('senha_input');
-            const icon = document.querySelector('.fa-eye');
-            if (input.type === "password") { input.type = "text"; icon.classList.add('text-black'); }
-            else { input.type = "password"; icon.classList.remove('text-black'); }
+        function toggleVisibility(id, icon) {
+            const input = document.getElementById(id);
+            if (input.type === "password") { 
+                input.type = "text"; 
+                icon.classList.add('text-black'); 
+            } else { 
+                input.type = "password"; 
+                icon.classList.remove('text-black'); 
+            }
+        }
+        
+        function validarSenha(event) {
+            const senha1 = document.getElementById('nova_senha').value;
+            const senha2 = document.getElementById('confirmar_senha').value;
+            const erro = document.getElementById('senha-error');
+            
+            if (senha1 !== senha2) {
+                event.preventDefault();
+                erro.classList.remove('hidden');
+                return false;
+            }
+            erro.classList.add('hidden');
+            return true;
+        }
+
+        // Função API ViaCEP
+        function buscarCEP(cep) {
+            // Limpa caracteres não numéricos
+            cep = cep.replace(/\D/g, '');
+            if (cep.length !== 8) return;
+
+            fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.erro) {
+                        document.getElementById('rua').value = data.logradouro;
+                        document.getElementById('bairro').value = data.bairro;
+                        document.getElementById('estado').value = data.uf;
+                        // Foca automaticamente no campo de número após preencher
+                        document.getElementById('numero').focus(); 
+                    } else {
+                        alert("CEP não encontrado.");
+                    }
+                })
+                .catch(error => console.error("Erro ao buscar CEP:", error));
         }
 
         setTimeout(() => { document.querySelectorAll('.fade-out').forEach(el => el.style.display = 'none'); }, 5000);
