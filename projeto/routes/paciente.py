@@ -46,29 +46,45 @@ def paciente_dashboard():
             except: erro = "Preencha todos os campos."
 
         elif acao == 'perfil':
-            senha = request.form.get('senha')
             email = request.form.get('email').strip().lower()
-            endereco = request.form.get('endereco')
             telefone = request.form.get('telefone')
             nome = request.form.get('nome')
+            
+            # Novos campos de Endereço
+            cep = request.form.get('cep')
+            rua = request.form.get('rua')
+            numero = request.form.get('numero') # Opcional
+            bairro = request.form.get('bairro')
+            estado = request.form.get('estado')
 
-            # VALIDAÇÕES OBRIGATÓRIAS
-            if not email or not senha or not endereco or not nome or not telefone:
-                erro = "Todos os campos (Nome, Email, Senha, Telefone e Endereço) são obrigatórios."
-            elif len(senha) < 6:
-                erro = "A senha deve ter no mínimo 6 caracteres para ser segura."
+            # VALIDAÇÕES OBRIGATÓRIAS (número é o único que pode ficar em branco)
+            if not email or not nome or not telefone or not cep or not rua or not bairro or not estado:
+                erro = "Todos os campos (Nome, Email, Telefone, CEP, Rua, Bairro e Estado) são obrigatórios."
             else:
                 current_user.nome = nome
                 current_user.email = email
                 current_user.telefone = telefone
-                current_user.endereco = endereco
-                current_user.set_senha(senha) # Atualiza a senha
+                current_user.cep = cep
+                current_user.rua = rua
+                current_user.numero = numero
+                current_user.bairro = bairro
+                current_user.estado = estado
                 
                 if 'foto_perfil' in request.files:
                     path = save_image(request.files['foto_perfil'])
                     if path: current_user.foto_perfil = path
                 db.session.commit()
                 sucesso = "Dados atualizados!"
+                
+        elif acao == 'alterar_senha':
+            nova_senha = request.form.get('nova_senha')
+            
+            if not nova_senha or len(nova_senha) < 6:
+                erro = "A senha deve ter no mínimo 6 caracteres para ser segura."
+            else:
+                current_user.set_senha(nova_senha) # Atualiza a senha
+                db.session.commit()
+                sucesso = "Senha atualizada com sucesso de forma segura!"
 
     # --- BUSCA E ORDENAÇÃO ---
     agora = datetime.now()
@@ -87,7 +103,7 @@ def paciente_dashboard():
         {'d': a.dentista_id, 'dt': a.data_hora.strftime('%Y-%m-%d'), 'h': a.data_hora.strftime('%H:%M')} 
         for a in Agendamento.query.filter(Agendamento.status.notlike('Cancelado%')).all()
     ]
-
+    
     return render_template('dash_paciente.html', 
                            futuras=futuras, 
                            passadas=passadas, 
@@ -96,4 +112,3 @@ def paciente_dashboard():
                            clinicas=Clinica.query.all(),
                            erro=erro, sucesso=sucesso,
                            date=date, agora=agora) # Enviando agora para regra das 18h
-from datetime import datetime, timedelta

@@ -62,9 +62,6 @@
                 <a onclick="showTab('perfil')" class="cursor-pointer block p-3 px-4 text-sm font-medium text-gray-500 hover:text-black hover:bg-gray-50 rounded-lg transition flex items-center gap-3 desktop-link">
                     <i class="fas fa-user-edit w-4 text-center"></i> Meus Dados
                 </a>
-                <a onclick="showTab('seguranca')" class="cursor-pointer block p-3 px-4 text-sm font-medium text-gray-500 hover:text-black hover:bg-gray-50 rounded-lg transition flex items-center gap-3 desktop-link">
-                    <i class="fas fa-shield-alt w-4 text-center"></i> Segurança
-                </a>
             </nav>
         </div>
         <div class="p-6 border-t border-gray-50">
@@ -366,7 +363,7 @@
                             <p class="text-xs text-[#bf9b30] font-bold uppercase tracking-widest mt-1 mb-4">Patient ID: #{{ '%05d' % current_user.id }}</p>
                             
                             <div class="bg-gray-50 rounded-xl p-4 text-left space-y-3 border border-gray-100">
-                                <p class="text-xs text-gray-600 flex items-center gap-3"><i class="fas fa-envelope w-4 text-[#bf9b30] text-center"></i> <span class="truncate">{{ current_user.email }}</span></p>
+                                <p class="text-xs text-gray-600 flex items-center gap-3"><i class="fas fa-envelope w-4 text-[#bf9b30] text-center"></i> <span class="truncate" id="display_email">{{ current_user.email }}</span></p>
                                 {% if current_user.telefone %}
                                 <p class="text-xs text-gray-600 flex items-center gap-3"><i class="fas fa-phone w-4 text-[#bf9b30] text-center"></i> <span>{{ current_user.telefone }}</span></p>
                                 {% endif %}
@@ -384,8 +381,9 @@
                             </button>
                         </div>
                         
-                        <form method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
+                        <form method="POST" enctype="multipart/form-data" class="p-8 space-y-6" onsubmit="return validarAlteracaoEmail(event)">
                             <input type="hidden" name="acao" value="perfil">
+                            <input type="hidden" id="email_original" value="{{ current_user.email }}">
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
@@ -400,8 +398,11 @@
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-gray-50">
                                 <div>
-                                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-2 tracking-widest">WhatsApp</label>
-                                    <input type="text" name="telefone" id="telefone" value="{{ current_user.telefone or '' }}" required disabled class="input-locked w-full text-sm outline-none border-b border-transparent focus:border-[#bf9b30] pb-2">
+                                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-2 tracking-widest">Número do Celular</label>
+                                    <div class="flex gap-2">
+                                        <input type="text" name="telefone" id="telefone" value="{{ current_user.telefone or '' }}" required disabled class="input-locked w-full text-sm outline-none border-b border-transparent focus:border-[#bf9b30] pb-2">
+                                        <button type="button" id="btn-verificar-tel" onclick="solicitarCodigoSMS()" class="hidden text-[10px] bg-gray-200 text-gray-600 px-3 py-1 rounded font-bold uppercase hover:bg-gray-300 transition">Verificar</button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -434,6 +435,14 @@
                                 </div>
                             </div>
                             
+                            <div class="pt-6 border-t border-gray-50 flex justify-between items-center">
+                                <div>
+                                    <p class="text-sm font-bold text-gray-800">Segurança da Conta</p>
+                                    <p class="text-xs text-gray-500">Gerencie sua senha de acesso.</p>
+                                </div>
+                                <button type="button" onclick="abrirModalSenha()" class="px-4 py-2 bg-gray-100 text-gray-700 text-xs font-bold rounded-lg hover:bg-gray-200 transition uppercase tracking-widest border border-gray-200">Alterar Senha</button>
+                            </div>
+
                             <div class="flex gap-3 pt-8 mt-4">
                                 <button type="submit" id="btn-salvar" class="hidden flex-1 md:flex-none px-8 py-3 bg-black rounded-lg text-xs font-bold text-white hover:bg-[#bf9b30] transition shadow-lg uppercase tracking-widest">Salvar Alterações</button>
                                 <button type="button" id="btn-cancelar" onclick="window.location.reload()" class="hidden flex-1 md:flex-none px-8 py-3 bg-gray-100 border border-gray-200 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-200 transition uppercase tracking-widest">Cancelar</button>
@@ -443,55 +452,62 @@
                 </div>
             </div>
         </div>
-
-        <div id="seguranca" class="tab-content hidden">
-            <div class="flex justify-between items-end mb-8">
-                <div>
-                    <h2 class="text-2xl font-serif font-bold text-gray-900">Segurança</h2>
-                    <p class="text-sm text-gray-500">Altere sua senha de acesso ao portal.</p>
-                </div>
-            </div>
-            
-            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden max-w-2xl mx-auto">
-                <div class="p-8 border-b border-gray-50 bg-gray-50/50">
-                    <h3 class="font-bold text-gray-900"><i class="fas fa-shield-alt text-[#bf9b30] mr-2"></i> Alterar Senha</h3>
-                </div>
-                
-                <form method="POST" class="p-8 space-y-6" onsubmit="return validarSenha(event)">
-                    <input type="hidden" name="acao" value="alterar_senha">
-                    
-                    <div>
-                        <label class="block text-[10px] font-bold uppercase text-gray-400 mb-2 tracking-widest">Nova Senha</label>
-                        <div class="relative">
-                            <input type="password" name="nova_senha" id="nova_senha" minlength="6" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm outline-none focus:border-[#bf9b30] transition pr-10 shadow-sm" placeholder="Mínimo de 6 caracteres">
-                            <i class="fas fa-eye absolute right-4 top-3.5 text-gray-400 cursor-pointer hover:text-black transition" onclick="toggleVisibility('nova_senha', this)"></i>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-[10px] font-bold uppercase text-gray-400 mb-2 tracking-widest">Confirmar Nova Senha</label>
-                        <div class="relative">
-                            <input type="password" name="confirmar_senha" id="confirmar_senha" minlength="6" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm outline-none focus:border-[#bf9b30] transition pr-10 shadow-sm" placeholder="Repita a nova senha">
-                            <i class="fas fa-eye absolute right-4 top-3.5 text-gray-400 cursor-pointer hover:text-black transition" onclick="toggleVisibility('confirmar_senha', this)"></i>
-                        </div>
-                        <p id="senha-error" class="text-red-500 text-xs mt-2 hidden">As senhas não coincidem. Tente novamente.</p>
-                    </div>
-                    
-                    <div class="pt-4">
-                        <button type="submit" class="w-full md:w-auto px-8 py-3 bg-black rounded-lg text-xs font-bold text-white hover:bg-[#bf9b30] transition shadow-lg uppercase tracking-widest">Atualizar Senha</button>
-                    </div>
-                </form>
-            </div>
-        </div>
     </main>
 
-    <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur shadow-2xl z-50 flex overflow-x-auto scrollbar-hide justify-between px-4 py-3 border-t border-gray-100 space-x-6">
+    <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur shadow-2xl z-50 flex overflow-x-auto scrollbar-hide justify-between px-6 py-3 border-t border-gray-100">
         <button onclick="showTab('home')" class="mobile-link text-[#bf9b30] flex flex-col items-center shrink-0"><i class="fas fa-home text-lg"></i> <span class="text-[9px] font-bold uppercase mt-1">Início</span></button>
         <button onclick="showTab('agendar')" class="mobile-link text-gray-400 flex flex-col items-center shrink-0"><i class="fas fa-calendar-plus text-lg"></i> <span class="text-[9px] font-bold uppercase mt-1">Agendar</span></button>
         <button onclick="showTab('historico')" class="mobile-link text-gray-400 flex flex-col items-center shrink-0"><i class="fas fa-file-medical text-lg"></i> <span class="text-[9px] font-bold uppercase mt-1">Hist.</span></button>
         <button onclick="showTab('perfil')" class="mobile-link text-gray-400 flex flex-col items-center shrink-0"><i class="fas fa-user-md text-lg"></i> <span class="text-[9px] font-bold uppercase mt-1">Perfil</span></button>
-        <button onclick="showTab('seguranca')" class="mobile-link text-gray-400 flex flex-col items-center shrink-0"><i class="fas fa-lock text-lg"></i> <span class="text-[9px] font-bold uppercase mt-1">Senha</span></button>
     </nav>
+
+    <div id="modal-senha" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl overflow-hidden shadow-2xl animate-fade-in-up">
+            <div class="p-6 border-b border-gray-50 flex justify-between items-center">
+                <h3 class="font-serif text-xl font-bold text-gray-900"><i class="fas fa-lock text-[#bf9b30] mr-2"></i> Alterar Senha</h3>
+                <button type="button" onclick="fecharModalSenha()" class="text-gray-400 hover:text-red-500 transition"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <form method="POST" onsubmit="return validarSenhaModal(event)" class="p-6 space-y-5">
+                <input type="hidden" name="acao" value="alterar_senha">
+                
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-2 tracking-widest">Nova Senha</label>
+                    <div class="relative">
+                        <input type="password" name="nova_senha" id="nova_senha_modal" minlength="6" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm outline-none focus:border-[#bf9b30] transition pr-10 shadow-sm" placeholder="Mínimo de 6 caracteres">
+                        <i class="fas fa-eye absolute right-4 top-3.5 text-gray-400 cursor-pointer hover:text-black transition" onclick="toggleVisibility('nova_senha_modal', this)"></i>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-2 tracking-widest">Confirmar Nova Senha</label>
+                    <div class="relative">
+                        <input type="password" name="confirmar_senha" id="confirmar_senha_modal" minlength="6" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm outline-none focus:border-[#bf9b30] transition pr-10 shadow-sm" placeholder="Repita a nova senha">
+                        <i class="fas fa-eye absolute right-4 top-3.5 text-gray-400 cursor-pointer hover:text-black transition" onclick="toggleVisibility('confirmar_senha_modal', this)"></i>
+                    </div>
+                    <p id="senha-error-modal" class="text-red-500 text-xs mt-2 hidden">As senhas não coincidem. Tente novamente.</p>
+                </div>
+                
+                <button type="submit" class="w-full mt-4 px-8 py-3 bg-black rounded-lg text-xs font-bold text-white hover:bg-[#bf9b30] transition shadow-lg uppercase tracking-widest">Salvar Nova Senha</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-telefone" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl animate-fade-in-up p-8 text-center border-t-4 border-[#bf9b30]">
+            <div class="w-16 h-16 bg-[#bf9b30]/10 text-[#bf9b30] rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="fas fa-mobile-alt"></i>
+            </div>
+            <h3 class="text-xl font-serif font-bold text-gray-900 mb-2">Verificar Celular</h3>
+            <p class="text-sm text-gray-500 mb-6">Enviamos um código de 6 dígitos via SMS para o seu número. Insira abaixo para confirmar.</p>
+            
+            <input type="text" id="codigo_sms" maxlength="6" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-center text-xl font-mono tracking-widest outline-none focus:border-[#bf9b30] mb-4" placeholder="000000">
+            
+            <div class="grid grid-cols-2 gap-3">
+                <button type="button" onclick="fecharModalTelefone()" class="py-3 border border-gray-200 rounded-xl text-gray-500 font-bold text-xs hover:bg-gray-50 transition">Cancelar</button>
+                <button type="button" onclick="confirmarCodigoSMS()" class="py-3 bg-[#bf9b30] text-white rounded-xl font-bold text-xs hover:bg-yellow-600 transition shadow-lg">Confirmar</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         const allDoctors = [
@@ -502,7 +518,6 @@
         
         const ocupados = {{ ocupados|tojson|default('[]') }};
 
-        // PASSA DATAS BLOQUEADAS PARA O JS
         const datasBloqueadasDict = {};
         {% for d in dentistas %}
             {% if d.folgas %}
@@ -543,7 +558,6 @@
             }
         }
 
-        // Função para ir direto ao prontuário
         function abrirProntuario(id) {
             showTab('historico');
             setTimeout(() => {
@@ -559,12 +573,8 @@
         const timeSelect = document.getElementById('hora_input');
         const dateInput = document.getElementById('data_agendar');
         
-        // --- CORREÇÃO DO FUSO HORÁRIO E DATA MÍNIMA ---
-        
-        // 1. Data Atual em Brasília (UTC-3)
         const nowBrasilia = new Date(new Date().toLocaleString("en-US", {timeZone: "America/Sao_Paulo"}));
         
-        // Formata YYYY-MM-DD
         const todayStr = nowBrasilia.getFullYear() + '-' + 
                          String(nowBrasilia.getMonth() + 1).padStart(2, '0') + '-' + 
                          String(nowBrasilia.getDate()).padStart(2, '0');
@@ -573,7 +583,6 @@
             const selectedDate = dateInput.value;
             const selectedDoc = document.getElementById('dentista_select').value;
             
-            // RESET ESTILOS
             dateInput.classList.remove('blocked-input');
             timeSelect.classList.remove('blocked-input');
             timeSelect.disabled = false;
@@ -582,7 +591,6 @@
 
             const medico = allDoctors.find(d => d.id === selectedDoc);
 
-            // 1. VERIFICAÇÃO DE BLOQUEIO (DATA ESPECÍFICA)
             if (datasBloqueadasDict[selectedDoc] && datasBloqueadasDict[selectedDoc].includes(selectedDate)) {
                 dateInput.classList.add('blocked-input');
                 timeSelect.classList.add('blocked-input');
@@ -591,7 +599,6 @@
                 return;
             }
 
-            // 2. VERIFICAÇÃO DE FOLGA SEMANAL
             const dateObj = new Date(selectedDate + "T00:00:00");
             let dayOfWeek = dateObj.getDay(); 
             let pyDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
@@ -604,18 +611,15 @@
                 return;
             }
 
-            // Recalcula hora atual de Brasília
             const now = new Date(new Date().toLocaleString("en-US", {timeZone: "America/Sao_Paulo"}));
             const currentHour = now.getHours();
             
-            // Calcula "Amanhã" em Brasília
             const tomorrow = new Date(now);
             tomorrow.setDate(tomorrow.getDate() + 1);
             const tomorrowStr = tomorrow.getFullYear() + '-' + 
                                 String(tomorrow.getMonth() + 1).padStart(2, '0') + '-' + 
                                 String(tomorrow.getDate()).padStart(2, '0');
 
-            // 1. Reseta todos os horários para disponíveis
             timeSelect.innerHTML = `
                 <option value="08:00">08:00</option><option value="09:00">09:00</option>
                 <option value="10:00">10:00</option><option value="11:00">11:00</option>
@@ -624,7 +628,6 @@
                 <option value="17:00">17:00</option>
             `;
 
-            // 2. Regra das 18h: Se for depois das 18h (Brasília) e a data selecionada for AMANHÃ
             if (selectedDate === tomorrowStr && currentHour >= 18) {
                 for(let i=0; i < timeSelect.options.length; i++) {
                     const val = timeSelect.options[i].value;
@@ -636,19 +639,16 @@
                 }
             }
 
-            // 3. Regra do Passado e Antecedência Mínima (Se for HOJE)
             if (selectedDate === todayStr) {
                 for(let i=0; i < timeSelect.options.length; i++) {
-                    const timeValue = timeSelect.options[i].value; // ex: "08:00"
+                    const timeValue = timeSelect.options[i].value; 
                     const hour = parseInt(timeValue.split(':')[0]);
                     
-                    // Bloqueia 08:00 e 09:00 se a marcação for antes das 08h da manhã do próprio dia 
                     if (currentHour < 8 && (hour === 8 || hour === 9)) {
                         timeSelect.options[i].disabled = true;
                         timeSelect.options[i].style.color = "#ccc";
                         timeSelect.options[i].innerText = timeValue + " (Processamento)";
                     }
-                    // Regra fixa de antecedência de no mínimo 2 horas para as demais marcações de hoje
                     else if (hour <= currentHour + 1) {
                         timeSelect.options[i].disabled = true;
                         timeSelect.options[i].style.color = "#ccc";
@@ -657,7 +657,6 @@
                 }
             }
 
-            // 4. Regra de Horários Ocupados (Banco de Dados)
             if (selectedDate && selectedDoc) {
                 ocupados.forEach(agendamento => {
                     if (String(agendamento.d) === String(selectedDoc) && agendamento.dt === selectedDate) {
@@ -682,7 +681,6 @@
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(tabId).classList.remove('hidden');
             
-            // Lógica Desktop Links
             document.querySelectorAll('.desktop-link').forEach(btn => {
                 btn.classList.remove('text-black', 'bg-gray-50');
                 btn.classList.add('text-gray-500');
@@ -692,7 +690,6 @@
                 }
             });
             
-            // Lógica Mobile Links
             document.querySelectorAll('.mobile-link').forEach(btn => {
                 btn.classList.replace('text-[#bf9b30]', 'text-gray-400');
                 if(btn.getAttribute('onclick').includes(tabId)) {
@@ -709,7 +706,6 @@
                     el.classList.remove('input-locked'); 
                     el.classList.add('input-editable'); 
                     
-                    // Remove borders applied manually for locked view
                     if(el.classList.contains('border-transparent')) {
                         el.classList.remove('border-transparent');
                         el.classList.add('border-gray-200');
@@ -720,6 +716,7 @@
             document.getElementById('btn-editar').classList.add('hidden');
             document.getElementById('btn-salvar').classList.remove('hidden');
             document.getElementById('btn-cancelar').classList.remove('hidden');
+            document.getElementById('btn-verificar-tel').classList.remove('hidden');
         }
 
         function toggleVisibility(id, icon) {
@@ -733,10 +730,14 @@
             }
         }
         
-        function validarSenha(event) {
-            const senha1 = document.getElementById('nova_senha').value;
-            const senha2 = document.getElementById('confirmar_senha').value;
-            const erro = document.getElementById('senha-error');
+        // MODAL E VALIDAÇÃO DE SENHA
+        function abrirModalSenha() { document.getElementById('modal-senha').classList.remove('hidden'); }
+        function fecharModalSenha() { document.getElementById('modal-senha').classList.add('hidden'); }
+
+        function validarSenhaModal(event) {
+            const senha1 = document.getElementById('nova_senha_modal').value;
+            const senha2 = document.getElementById('confirmar_senha_modal').value;
+            const erro = document.getElementById('senha-error-modal');
             
             if (senha1 !== senha2) {
                 event.preventDefault();
@@ -744,12 +745,37 @@
                 return false;
             }
             erro.classList.add('hidden');
+            
+            // Simulação de Disparo de Email de Confirmação de Senha via API
+            fetch('/api/notificacoes/senha-alterada', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ mensagem: "Senha atualizada com sucesso" })
+            });
+            alert("Sua senha foi alterada. Enviamos um e-mail de confirmação para a sua segurança.");
+            
+            return true;
+        }
+
+        // VALIDAÇÃO E DISPARO DE MUDANÇA DE E-MAIL
+        function validarAlteracaoEmail(event) {
+            const emailAntigo = document.getElementById('email_original').value;
+            const emailNovo = document.getElementById('email').value;
+
+            if (emailAntigo !== emailNovo) {
+                // Simulação de Disparo de Email de Confirmação via API
+                fetch('/api/notificacoes/confirmar-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: emailNovo })
+                });
+                alert("Alteração de e-mail detectada! Um link de confirmação foi enviado para " + emailNovo + ". Verifique sua caixa de entrada.");
+            }
             return true;
         }
 
         // Função API ViaCEP
         function buscarCEP(cep) {
-            // Limpa caracteres não numéricos
             cep = cep.replace(/\D/g, '');
             if (cep.length !== 8) return;
 
@@ -760,7 +786,6 @@
                         document.getElementById('rua').value = data.logradouro;
                         document.getElementById('bairro').value = data.bairro;
                         document.getElementById('estado').value = data.uf;
-                        // Foca automaticamente no campo de número após preencher
                         document.getElementById('numero').focus(); 
                     } else {
                         alert("CEP não encontrado.");
@@ -768,6 +793,89 @@
                 })
                 .catch(error => console.error("Erro ao buscar CEP:", error));
         }
+
+        // Funções da API de Confirmação de Celular (SMS)
+        function solicitarCodigoSMS() {
+            const numero = document.getElementById('telefone').value;
+            if(numero.length < 10) return alert("Insira um número válido com DDD.");
+            
+            // Simulação de API para enviar código SMS
+            fetch('/api/notificacoes/enviar-sms', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telefone: numero })
+            });
+            
+            document.getElementById('modal-telefone').classList.remove('hidden');
+        }
+
+        function fecharModalTelefone() {
+            document.getElementById('modal-telefone').classList.add('hidden');
+            document.getElementById('codigo_sms').value = '';
+        }
+
+        function confirmarCodigoSMS() {
+            const codigo = document.getElementById('codigo_sms').value;
+            if(codigo.length !== 6) return alert("Insira o código de 6 dígitos.");
+            
+            // Validação simulada
+            alert("Número confirmado com sucesso!");
+            fecharModalTelefone();
+            
+            const btn = document.getElementById('btn-verificar-tel');
+            btn.classList.add('hidden');
+            btn.insertAdjacentHTML('afterend', '<span class="text-green-500 text-xs font-bold pt-2"><i class="fas fa-check-circle"></i> Verificado</span>');
+        }
+
+        // --- INTEGRAÇÃO DE APIs PARA AGENDA (NOTIFICAÇÕES DE PACIENTE) ---
+        // NOTA PARA O BACKEND (Python/Flask):
+        
+        // 1. CRONJOB DE LEMBRETE (3 DIAS DE ANTECEDÊNCIA):
+        // O backend deve rodar um worker (ex: Celery ou cron) que avalia:
+        // agendamentos = Consulta.query.filter(data_hora == (Hoje + 3 dias)).all()
+        // Para cada um, disparar este e-mail:
+        /*
+            Assunto: Lembrete de Consulta - L'Odontologie
+            
+            Prezado(a) {nome_paciente},
+            
+            Gostaríamos de lembrar que sua consulta para {servico} está confirmada e ocorrerá em breve.
+            
+            Data: {data_da_consulta}
+            Horário: {hora_da_consulta}
+            Clínica: {nome_da_clinica}
+            Endereço: {endereco_da_clinica}
+            
+            Para visualizar os detalhes completos, cancelar ou remarcar, por favor acesse nosso portal:
+            {link_portal_paciente}
+            
+            Agradecemos a preferência e aguardamos sua visita.
+            
+            Atenciosamente,
+            Equipe L'Odontologie.
+        */
+
+        // 2. NOTIFICAÇÃO DE CANCELAMENTO PELO MÉDICO/ADMIN:
+        // Ao processar o cancelamento da consulta no backend, disparar o seguinte e-mail para o paciente:
+        /*
+            Assunto: Aviso de Cancelamento de Consulta - L'Odontologie
+            
+            Prezado(a) {nome_paciente},
+            
+            Informamos que, por motivos de força maior, sua consulta precisou ser cancelada pela nossa equipe médica.
+            
+            Detalhes da Consulta Cancelada:
+            Especialista: Dr(a). {nome_medico}
+            Data Original: {data_da_consulta} às {hora_da_consulta}
+            
+            Pedimos desculpas pelo inconveniente. Para reagendar seu atendimento no momento mais oportuno, acesse a sua conta em nosso portal:
+            {link_portal_paciente}
+            
+            Em caso de dúvidas ou dor/urgência, entre em contato imediatamente com nossos canais de atendimento.
+            
+            Atenciosamente,
+            Equipe L'Odontologie.
+        */
 
         setTimeout(() => { document.querySelectorAll('.fade-out').forEach(el => el.style.display = 'none'); }, 5000);
     </script>
